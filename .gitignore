@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Database (SQLite file stays on server)
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# Environment variables
+.env
+**/.env
+
+# Frontend build output
+frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

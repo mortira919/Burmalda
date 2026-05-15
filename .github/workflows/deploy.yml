@@ -1,0 +1,40 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /var/www/crm
+
+            echo "=== Git pull ==="
+            git pull origin main
+
+            echo "=== Backend ==="
+            cd backend
+            npm install --production
+            npx prisma generate
+            npx prisma db push
+            pm2 restart crm-backend || pm2 start src/index.js --name crm-backend
+            pm2 save
+
+            echo "=== Frontend ==="
+            cd ../frontend
+            npm install
+            npm run build
+
+            echo "=== Reload nginx ==="
+            systemctl reload nginx
+
+            echo "=== Done! ==="

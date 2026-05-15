@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("manager") // admin | manager
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String?
+  email     String?
+  company   String?
+  notes     String?
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Lead {
+  id              Int      @id @default(autoincrement())
+  name            String
+  phone           String?
+  email           String?
+  company         String?
+  status          String   @default("thinking") // thinking | needs_tz | waiting_prepay | rejected | converted
+  notes           String?
+  lastContactDate DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Employee {
+  id              Int               @id @default(autoincrement())
+  name            String
+  role            String            // backend | frontend | mobile | designer | manager | other
+  defaultPercent  Float             @default(0)
+  phone           String?
+  email           String?
+  notes           String?
+  projectMembers  ProjectEmployee[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Project {
+  id            Int               @id @default(autoincrement())
+  name          String
+  clientId      Int?
+  client        Client?           @relation(fields: [clientId], references: [id])
+  status        String            @default("development") // development | testing | revision | completed | paused
+  priority      String            @default("medium") // low | medium | high | urgent
+  startDate     DateTime?
+  deadline      DateTime?
+  budget        Float             @default(0)
+  prepayment    Float             @default(0)
+  docLink       String?
+  notes         String?
+  stage         String            @default("design")
+  members       ProjectEmployee[]
+  transactions  Transaction[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model ProjectEmployee {
+  id         Int      @id @default(autoincrement())
+  projectId  Int
+  employeeId Int
+  percent    Float
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, employeeId])
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  projectId   Int?
+  project     Project? @relation(fields: [projectId], references: [id])
+  type        String   // income | expense
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  category    String   // ads | rent | software | salary | bonus | other
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Settings {
+  id       Int   @id @default(autoincrement())
+  key      String @unique
+  value    String
+}
