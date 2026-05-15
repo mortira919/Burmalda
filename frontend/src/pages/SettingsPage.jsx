@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { settingsApi } from '../api/client';
 import { Settings2, Save, CheckCircle2, Percent, Building2, Coins } from 'lucide-react';
 
@@ -55,7 +55,7 @@ export default function SettingsPage() {
                     settings.currency === sym
                       ? 'bg-primary-600/20 border-primary-500/50 text-primary-400'
                       : 'border-white/10 text-gray-500 hover:border-white/20 hover:text-gray-300'}`}
-                  style={settings.currency !== sym ? { background: '#1A1A1A' } : {}}>
+                  style={settings.currency !== sym ? { background: '#111A14' } : {}}>
                   <span className="text-lg">{sym}</span> {name}
                 </button>
               ))}
@@ -82,7 +82,7 @@ export default function SettingsPage() {
           </div>
 
           {taxRate > 0 && (
-            <div className="rounded-xl p-4 space-y-2" style={{ background: '#1A1A1A', border: '1px solid #2E2E2E' }}>
+            <div className="rounded-xl p-4 space-y-2" style={{ background: '#111A14', border: '1px solid #1E2A1E' }}>
               <p className="text-xs text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
                 <Coins size={12} /> Пример расчёта для 1 500 000 {settings.currency}
               </p>
@@ -95,7 +95,7 @@ export default function SettingsPage() {
                   <span className={`font-mono font-medium ${c}`}>{v}</span>
                 </div>
               ))}
-              <div className="flex justify-between items-center text-sm pt-2" style={{ borderTop: '1px solid #2E2E2E' }}>
+              <div className="flex justify-between items-center text-sm pt-2" style={{ borderTop: '1px solid #1E2A1E' }}>
                 <span className="text-white font-medium">К распределению</span>
                 <span className="font-mono font-bold text-primary-400">{exDistrib.toLocaleString('ru-RU')} {settings.currency}</span>
               </div>

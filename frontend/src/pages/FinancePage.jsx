@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+﻿import React, { useEffect, useState, useCallback } from 'react';
 import { financeApi, projectsApi } from '../api/client';
 import { formatDate, formatMoney, EXPENSE_CATEGORY } from '../utils/helpers';
 import Modal from '../components/Modal';
@@ -20,7 +20,7 @@ function TransactionForm({ projects, onSave, onCancel }) {
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${form.type === v
                 ? (v === 'income' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-red-500/20 border-red-500/50 text-red-400')
                 : 'border-white/10 text-gray-500 hover:border-white/20'}`}
-              style={form.type !== v ? { background: '#1A1A1A' } : {}}>
+              style={form.type !== v ? { background: '#111A14' } : {}}>
               {l}
             </button>
           ))}
@@ -114,7 +114,7 @@ export default function FinancePage() {
         {[
           { icon: TrendingUp, label: 'Общий доход', value: formatMoney(totalIncome), color: 'text-green-400', bg: 'rgba(74,222,128,0.1)' },
           { icon: TrendingDown, label: 'Расходы', value: formatMoney(totalExpenses + totalExpTx), color: 'text-red-400', bg: 'rgba(239,68,68,0.1)' },
-          { icon: Scale, label: 'Баланс', value: formatMoney(balance), color: balance >= 0 ? 'text-white' : 'text-red-400', bg: 'rgba(233,84,32,0.1)' },
+          { icon: Scale, label: 'Баланс', value: formatMoney(balance), color: balance >= 0 ? 'text-white' : 'text-red-400', bg: 'rgba(22,163,74,0.1)' },
         ].map(({ icon: Icon, label, value, color, bg }) => (
           <div key={label} className="stat-card">
             <div className="flex items-start justify-between">
@@ -131,7 +131,7 @@ export default function FinancePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 rounded-xl w-fit" style={{ background: '#1A1A1A', border: '1px solid #2E2E2E' }}>
+      <div className="flex gap-1 p-1 rounded-xl w-fit" style={{ background: '#111A14', border: '1px solid #1E2A1E' }}>
         {[['transactions', `Транзакции (${transactions.length})`], ['expenses', `Расходы (${expenses.length})`]].map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${tab === k ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-300'}`}>

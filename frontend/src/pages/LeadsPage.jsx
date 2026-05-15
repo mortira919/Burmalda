@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+﻿import React, { useEffect, useState, useCallback } from 'react';
 import { leadsApi } from '../api/client';
 import { formatDate, LEAD_STATUS } from '../utils/helpers';
 import Modal from '../components/Modal';
@@ -45,7 +45,7 @@ function LeadForm({ initial, onSave, onCancel }) {
 
 function LeadCard({ lead, onEdit, onDelete, onConvert }) {
   return (
-    <div className="rounded-xl p-3 group" style={{ background: '#1C1C1C', border: '1px solid #2E2E2E' }}>
+    <div className="rounded-xl p-3 group" style={{ background: '#1C1C1C', border: '1px solid #1E2A1E' }}>
       <p className="font-medium text-sm text-white">{lead.name}</p>
       {lead.company && <p className="text-xs text-gray-600 mt-0.5">{lead.company}</p>}
       {lead.phone && <p className="text-xs text-gray-600 mt-1">📞 {lead.phone}</p>}
@@ -93,11 +93,11 @@ export default function LeadsPage() {
           <p className="page-sub">{active.length} активных</p>
         </div>
         <div className="flex gap-3">
-          <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid #3D3D3D' }}>
-            <button onClick={() => setView('kanban')} className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${view === 'kanban' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-300'}`} style={view !== 'kanban' ? { background: '#1A1A1A' } : {}}>
+          <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid #2D3D2D' }}>
+            <button onClick={() => setView('kanban')} className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${view === 'kanban' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-300'}`} style={view !== 'kanban' ? { background: '#111A14' } : {}}>
               <Columns3 size={14} /> Канбан
             </button>
-            <button onClick={() => setView('list')} className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${view === 'list' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-300'}`} style={view !== 'list' ? { background: '#1A1A1A' } : {}}>
+            <button onClick={() => setView('list')} className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${view === 'list' ? 'bg-primary-600 text-white' : 'text-gray-500 hover:text-gray-300'}`} style={view !== 'list' ? { background: '#111A14' } : {}}>
               <LayoutList size={14} /> Список
             </button>
           </div>
@@ -110,7 +110,7 @@ export default function LeadsPage() {
           {LEAD_COLUMNS.map(col => {
             const cols = leads.filter(l => l.status === col.key);
             return (
-              <div key={col.key} className="rounded-xl p-3" style={{ background: '#1A1A1A', border: '1px solid #2E2E2E' }}>
+              <div key={col.key} className="rounded-xl p-3" style={{ background: '#111A14', border: '1px solid #1E2A1E' }}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-medium text-gray-300 flex items-center gap-1.5">
                     <span>{col.emoji}</span> {col.label}

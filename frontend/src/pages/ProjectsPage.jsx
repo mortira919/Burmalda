@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { projectsApi, clientsApi, employeesApi } from '../api/client';
 import { formatDate, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_PRIORITY, PROJECT_STAGE } from '../utils/helpers';
@@ -43,7 +43,7 @@ function QuickSelect({ value, options, colorMap, onSelect }) {
       </button>
       {open && (
         <div className="absolute z-30 top-full left-0 mt-1 rounded-xl shadow-2xl py-1 min-w-max"
-          style={{ background: '#1A1A1A', border: '1px solid #3D3D3D' }}>
+          style={{ background: '#111A14', border: '1px solid #2D3D2D' }}>
           {Object.entries(options).map(([k, v]) => (
             <button key={k} type="button" onClick={() => { onSelect(k); setOpen(false); }}
               className="w-full text-left px-3 py-2 text-xs hover:bg-white/5 flex items-center gap-2 transition-colors">
@@ -151,7 +151,7 @@ function ProjectForm({ initial, clients, employees, onSave, onCancel }) {
                   form.stage === k
                     ? 'bg-primary-600/20 border border-primary-500/50 text-primary-400'
                     : 'border border-white/10 text-gray-500 hover:border-white/20 hover:text-gray-300'
-                }`} style={form.stage !== k ? { background: '#1A1A1A' } : {}}>
+                }`} style={form.stage !== k ? { background: '#111A14' } : {}}>
                 <span>{em}</span> {lb}
               </button>
             ))}
@@ -178,7 +178,7 @@ function ProjectForm({ initial, clients, employees, onSave, onCancel }) {
         </div>
         <div className="space-y-2">
           {form.members.map((m, idx) => (
-            <div key={idx} className="flex items-center gap-2 p-2 rounded-xl" style={{ background: '#1A1A1A', border: '1px solid #3D3D3D' }}>
+            <div key={idx} className="flex items-center gap-2 p-2 rounded-xl" style={{ background: '#111A14', border: '1px solid #2D3D2D' }}>
               <select className="input flex-1" value={m.employeeId} onChange={e => updateMember(idx, 'employeeId', Number(e.target.value))}>
                 {employees.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
@@ -275,7 +275,7 @@ export default function ProjectsPage() {
           const days = daysUntil(p.deadline);
           const balance = p.budget - p.prepayment;
           const isOverdue = days !== null && days < 0 && p.status !== 'completed';
-          const leftColor = isOverdue ? '#ef4444' : p.priority === 'urgent' ? '#f97316' : p.priority === 'high' ? '#fb923c' : '#E95420';
+          const leftColor = isOverdue ? '#ef4444' : p.priority === 'urgent' ? '#f97316' : p.priority === 'high' ? '#fb923c' : '#16a34a';
           return (
             <div key={p.id} className="card p-0 overflow-hidden">
               <div className="flex" style={{ borderLeft: `3px solid ${leftColor}` }}>

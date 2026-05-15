@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -19,7 +19,7 @@ const navItems = [
 
 function Avatar({ name, size = 8, className = '' }) {
   const initials = name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
-  const colors = ['#E95420','#77216F','#0E8420','#006EAF','#AEA79F'];
+  const colors = ['#16a34a','#77216F','#0E8420','#006EAF','#AEA79F'];
   const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
   return (
     <div
@@ -39,19 +39,19 @@ export default function Layout() {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#1C1C1C' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#111A14' }}>
 
       {/* Sidebar */}
       <aside className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
         fixed lg:static inset-y-0 left-0 z-50 w-60 flex flex-col
         transition-transform duration-200
-      `} style={{ background: '#0F0F0F', borderRight: '1px solid #2A2A2A' }}>
+      `} style={{ background: '#0A120A', borderRight: '1px solid #1E2A1E' }}>
 
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 h-16 shrink-0" style={{ borderBottom: '1px solid #2A2A2A' }}>
+        <div className="flex items-center gap-3 px-5 h-16 shrink-0" style={{ borderBottom: '1px solid #1E2A1E' }}>
           <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: 'linear-gradient(135deg,#E95420,#77216F)' }}>
+            style={{ background: 'linear-gradient(135deg,#16a34a,#77216F)' }}>
             <span className="text-white font-bold text-sm">S</span>
           </div>
           <div>
@@ -95,10 +95,10 @@ export default function Layout() {
         </nav>
 
         {/* User */}
-        <div className="p-3 shrink-0" style={{ borderTop: '1px solid #2A2A2A' }}>
-          <div className="flex items-center gap-3 p-2 rounded-lg" style={{ background: '#1C1C1C' }}>
+        <div className="p-3 shrink-0" style={{ borderTop: '1px solid #1E2A1E' }}>
+          <div className="flex items-center gap-3 p-2 rounded-lg" style={{ background: '#111A14' }}>
             <img
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'U')}&backgroundColor=e95420&fontFamily=Ubuntu&fontSize=38`}
+              src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user?.name || 'U')}&backgroundColor=16a34a&fontFamily=Ubuntu&fontSize=38`}
               alt={user?.name}
               className="w-8 h-8 rounded-full shrink-0"
             />
@@ -123,7 +123,7 @@ export default function Layout() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile header */}
         <header className="lg:hidden h-14 flex items-center px-4 gap-3 shrink-0"
-          style={{ background: '#0F0F0F', borderBottom: '1px solid #2A2A2A' }}>
+          style={{ background: '#0A120A', borderBottom: '1px solid #1E2A1E' }}>
           <button onClick={() => setSidebarOpen(true)} className="text-gray-400 hover:text-white">
             <Menu size={20} />
           </button>

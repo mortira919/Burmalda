@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+﻿import React, { useEffect, useState, useCallback } from 'react';
 import { clientsApi } from '../api/client';
 import { formatMoney } from '../utils/helpers';
 import Modal from '../components/Modal';
@@ -51,7 +51,7 @@ export default function ClientsPage() {
     return !q || c.name.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q) || c.company?.toLowerCase().includes(q);
   });
 
-  const AVATAR_COLORS = ['#E95420','#77216F','#0E8420','#006EAF'];
+  const AVATAR_COLORS = ['#16a34a','#77216F','#0E8420','#006EAF'];
   const getColor = (name) => AVATAR_COLORS[(name?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
 
   if (loading) return <div className="flex justify-center py-32"><div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" /></div>;
@@ -111,12 +111,12 @@ export default function ClientsPage() {
                 </div>
               </div>
               {isExp && c.projects?.length > 0 && (
-                <div className="px-4 pb-4" style={{ borderTop: '1px solid #2E2E2E' }}>
+                <div className="px-4 pb-4" style={{ borderTop: '1px solid #1E2A1E' }}>
                   <p className="text-xs text-gray-600 uppercase tracking-wide mt-3 mb-2">История проектов</p>
                   <div className="space-y-1.5">
                     {c.projects.map(p => (
                       <div key={p.id} className="flex items-center justify-between p-2.5 rounded-lg text-sm"
-                        style={{ background: '#1A1A1A', border: '1px solid #2E2E2E' }}>
+                        style={{ background: '#111A14', border: '1px solid #1E2A1E' }}>
                         <span className="text-gray-300">{p.name}</span>
                         <span className="text-gray-500 font-mono">{formatMoney(p.budget)}</span>
                       </div>

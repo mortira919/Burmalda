@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { analyticsApi } from '../api/client';
 import { formatMoney } from '../utils/helpers';
 import { BarChart3, TrendingUp, TrendingDown, Users2, FolderKanban, Target, Receipt } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-const CHART_COLORS = ['#E95420','#f59e0b','#ef4444','#8b5cf6','#10b981'];
+const CHART_COLORS = ['#16a34a','#f59e0b','#ef4444','#8b5cf6','#10b981'];
 
 function KpiCard({ icon: Icon, label, value, color, bg }) {
   return (
@@ -26,7 +26,7 @@ function KpiCard({ icon: Icon, label, value, color, bg }) {
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl p-3 text-sm" style={{ background: '#1A1A1A', border: '1px solid #3D3D3D' }}>
+    <div className="rounded-xl p-3 text-sm" style={{ background: '#111A14', border: '1px solid #2D3D2D' }}>
       <p className="text-gray-400 mb-1">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.fill }} className="font-mono">{formatMoney(p.value)}</p>
@@ -48,7 +48,7 @@ export default function AnalyticsPage() {
   }, [year, month]);
 
   const barData = data ? [
-    { name: 'Выручка',  amount: data.revenue,             fill: '#E95420' },
+    { name: 'Выручка',  amount: data.revenue,             fill: '#16a34a' },
     { name: 'Налог',    amount: data.tax,                  fill: '#f59e0b' },
     { name: 'Расходы',  amount: data.expenses,             fill: '#ef4444' },
     { name: 'Зарплата', amount: data.salaryTotal,          fill: '#8b5cf6' },
@@ -84,7 +84,7 @@ export default function AnalyticsPage() {
       ) : (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KpiCard icon={TrendingUp}  label="Выручка"           value={formatMoney(data?.revenue ?? 0)}    color="text-primary-400" bg="rgba(233,84,32,0.1)" />
+            <KpiCard icon={TrendingUp}  label="Выручка"           value={formatMoney(data?.revenue ?? 0)}    color="text-primary-400" bg="rgba(22,163,74,0.1)" />
             <KpiCard icon={Receipt}     label={`Налог (${data?.taxRate ?? 0}%)`} value={formatMoney(data?.tax ?? 0)} color="text-yellow-400" bg="rgba(245,158,11,0.1)" />
             <KpiCard icon={Users2}      label="Зарплаты"          value={formatMoney(data?.salaryTotal ?? 0)} color="text-purple-400" bg="rgba(139,92,246,0.1)" />
             <KpiCard icon={TrendingDown} label="Чистая прибыль"   value={formatMoney(data?.netProfit ?? 0)}  color={(data?.netProfit ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'} bg="rgba(16,185,129,0.1)" />
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard icon={TrendingDown} label="Расходы компании" value={formatMoney(data?.expenses ?? 0)}   color="text-red-400"   bg="rgba(239,68,68,0.1)" />
             <KpiCard icon={FolderKanban} label="Закрытых проектов" value={data?.closedProjects ?? 0}         color="text-white"     bg="rgba(255,255,255,0.05)" />
-            <KpiCard icon={FolderKanban} label="Активных проектов" value={data?.activeProjects ?? 0}         color="text-primary-400" bg="rgba(233,84,32,0.1)" />
+            <KpiCard icon={FolderKanban} label="Активных проектов" value={data?.activeProjects ?? 0}         color="text-primary-400" bg="rgba(22,163,74,0.1)" />
             <KpiCard icon={Target}       label="Новых лидов"       value={data?.newLeads ?? 0}               color="text-purple-400" bg="rgba(119,33,111,0.15)" />
           </div>
 
@@ -103,7 +103,7 @@ export default function AnalyticsPage() {
               </h2>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={barData} margin={{ top: 5, right: 10, bottom: 5, left: 10 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2E2E2E" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1E2A1E" />
                   <XAxis dataKey="name" tick={{ fill: '#6B6B6B', fontSize: 11 }} />
                   <YAxis tick={{ fill: '#6B6B6B', fontSize: 11 }} tickFormatter={v => (v/1000).toFixed(0)+'k'} />
                   <Tooltip content={<CustomTooltip />} />
@@ -123,7 +123,7 @@ export default function AnalyticsPage() {
                   <PieChart>
                     <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} innerRadius={40}
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      labelLine={{ stroke: '#3D3D3D' }}>
+                      labelLine={{ stroke: '#2D3D2D' }}>
                       {pieData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                     </Pie>
                     <Tooltip content={<CustomTooltip />} />

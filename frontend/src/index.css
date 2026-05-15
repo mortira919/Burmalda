@@ -10,7 +10,7 @@
   html { @apply h-full; }
 
   body {
-    background-color: #1C1C1C;
+    background-color: #111A14;
     color: #E8E8E8;
     font-family: 'Ubuntu', system-ui, sans-serif;
     @apply h-full antialiased;
@@ -19,11 +19,11 @@
   #root { @apply h-full; }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #1C1C1C; }
-  ::-webkit-scrollbar-thumb { background: #3D3D3D; border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: #E95420; }
+  ::-webkit-scrollbar-track { background: #111A14; }
+  ::-webkit-scrollbar-thumb { background: #2D3D2D; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #16a34a; }
 
-  ::selection { background: #E95420; color: white; }
+  ::selection { background: #16a34a; color: white; }
 }
 
 @layer components {
@@ -33,14 +33,18 @@
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
            bg-primary-600 hover:bg-primary-500 active:bg-primary-700
            text-white transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed
-           shadow-[0_0_0_0_#E95420] hover:shadow-[0_0_12px_2px_rgba(233,84,32,0.25)];
+           shadow-[0_0_0_0_#16a34a] hover:shadow-[0_0_12px_2px_rgba(22,163,74,0.3)];
   }
 
   .btn-secondary {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
-           bg-[#2E2E2E] hover:bg-[#3A3A3A] active:bg-[#252525]
-           text-gray-200 border border-[#3D3D3D] hover:border-[#555]
-           transition-all duration-150;
+           text-gray-200 border transition-all duration-150;
+    background-color: #1E2A1E;
+    border-color: #2D3D2D;
+  }
+  .btn-secondary:hover {
+    background-color: #243024;
+    border-color: #3D5A3D;
   }
 
   .btn-danger {
@@ -52,21 +56,21 @@
 
   /* ── Cards ──────────────────────────────── */
   .card {
-    background-color: #272727;
-    border: 1px solid #3D3D3D;
+    background-color: #182118;
+    border: 1px solid #2D3D2D;
     @apply rounded-xl p-6;
   }
 
   .card-sm {
-    background-color: #272727;
-    border: 1px solid #3D3D3D;
+    background-color: #182118;
+    border: 1px solid #2D3D2D;
     @apply rounded-xl p-4;
   }
 
   /* ── Forms ──────────────────────────────── */
   .input {
-    background-color: #1A1A1A;
-    border: 1px solid #3D3D3D;
+    background-color: #111A14;
+    border: 1px solid #2D3D2D;
     color: #E8E8E8;
     @apply w-full rounded-lg px-3 py-2 text-sm
            focus:outline-none focus:border-primary-600 focus:ring-1 focus:ring-primary-600/30
@@ -74,7 +78,7 @@
   }
 
   .input option {
-    background-color: #1A1A1A;
+    background-color: #111A14;
     color: #E8E8E8;
   }
 
@@ -88,10 +92,10 @@
   }
 
   /* ── Table ──────────────────────────────── */
-  .table-dark thead { background-color: #1A1A1A; }
+  .table-dark thead { background-color: #111A14; }
   .table-dark thead th { @apply text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider; }
-  .table-dark tbody tr { border-top: 1px solid #2E2E2E; }
-  .table-dark tbody tr:hover { background-color: #2E2E2E; }
+  .table-dark tbody tr { border-top: 1px solid #1E2A1E; }
+  .table-dark tbody tr:hover { background-color: #1E2A1E; }
   .table-dark tbody td { @apply px-4 py-3 text-sm text-gray-300; }
 
   /* ── Page header ────────────────────────── */
@@ -100,25 +104,25 @@
 
   /* ── Stat card ──────────────────────────── */
   .stat-card {
-    background: linear-gradient(135deg, #272727 0%, #2E2E2E 100%);
-    border: 1px solid #3D3D3D;
+    background: linear-gradient(135deg, #182118 0%, #1E2A1E 100%);
+    border: 1px solid #2D3D2D;
     @apply rounded-xl p-5 relative overflow-hidden;
   }
   .stat-card::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-    background: linear-gradient(135deg, rgba(233,84,32,0.05) 0%, transparent 100%);
+    background: linear-gradient(135deg, rgba(22,163,74,0.06) 0%, transparent 100%);
   }
   .stat-card:hover::before { @apply opacity-100; }
 }
 
 /* ── Recharts dark ──────────────────────────── */
 .recharts-cartesian-grid-horizontal line,
-.recharts-cartesian-grid-vertical line { stroke: #2E2E2E; }
+.recharts-cartesian-grid-vertical line { stroke: #1E2A1E; }
 .recharts-text { fill: #6B6B6B; font-size: 11px; }
 .recharts-tooltip-wrapper .recharts-default-tooltip {
-  background-color: #272727!important;
-  border-color: #3D3D3D!important;
+  background-color: #182118!important;
+  border-color: #2D3D2D!important;
   color: #E8E8E8!important;
   border-radius: 8px!important;
 }
