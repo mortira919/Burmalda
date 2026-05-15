@@ -21,7 +21,7 @@ function QuickSelect({ value, options, colorMap, onSelect }) {
       </button>
       {open && (
         <div className="absolute z-30 top-full left-0 mt-1 rounded-xl shadow-2xl py-1 min-w-max"
-          style={{ background: '#111A14', border: '1px solid #2D3D2D' }}>
+          style={{ background: '#0F0F0F', border: '1px solid #2A2A2A' }}>
           {Object.entries(options).map(([k, v]) => (
             <button key={k} type="button" onClick={() => { onSelect(k); setOpen(false); }}
               className="w-full text-left px-3 py-2 text-xs hover:bg-white/5 flex items-center gap-2 transition-colors">
@@ -100,7 +100,7 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={FolderKanban} title="Активных проектов" value={data?.activeProjects ?? 0}
-          sub="В работе прямо сейчас" color="text-primary-500" bg="rgba(22,163,74,0.1)" />
+          sub="В работе прямо сейчас" color="text-primary-500" bg="rgba(118,185,0,0.1)" />
         <StatCard icon={Banknote} title="Ожидаем оплату" value={formatMoney(data?.expectedPayments ?? 0)}
           sub="Дебиторская задолженность" color="text-orange-400" bg="rgba(251,146,60,0.1)" />
         <StatCard icon={Target} title="Лидов в работе" value={data?.newLeads ?? 0}
@@ -137,9 +137,9 @@ export default function DashboardPage() {
           <div className="space-y-2">
             {data.urgentDeadlines.map(p => (
               <div key={p.id} className="flex items-center gap-4 p-3 rounded-xl transition-colors"
-                style={{ background: '#111A14', border: '1px solid #1E2A1E' }}>
+                style={{ background: '#0F0F0F', border: '1px solid #212121' }}>
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(22,163,74,0.15)' }}>
+                  style={{ background: 'rgba(118,185,0,0.15)' }}>
                   <Clock size={16} className="text-primary-500" />
                 </div>
                 <div className="flex-1 min-w-0">

@@ -33,11 +33,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#111A14' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#0F0F0F' }}>
       {/* BG pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, #16a34a 0%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(circle, #76B900 0%, transparent 70%)' }} />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-10"
           style={{ background: 'radial-gradient(circle, #77216F 0%, transparent 70%)' }} />
       </div>
@@ -46,7 +46,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, #16a34a 0%, #77216F 100%)' }}>
+            style={{ background: 'linear-gradient(135deg, #76B900 0%, #77216F 100%)' }}>
             <WLogo size={30} />
           </div>
           <h1 className="text-2xl font-bold text-white">WorkWork Studio</h1>
@@ -54,7 +54,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-7" style={{ background: '#182118', border: '1px solid #2D3D2D' }}>
+        <div className="rounded-2xl p-7" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="label">Email</label>

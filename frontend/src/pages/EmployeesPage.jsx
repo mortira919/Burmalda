@@ -77,7 +77,7 @@ export default function EmployeesPage() {
             <div key={emp.id} className="card p-0 overflow-hidden">
               <div className="flex items-start gap-4 p-4">
                 <img
-                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(emp.name)}&backgroundColor=16a34a&fontFamily=Ubuntu&fontSize=38`}
+                  src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(emp.name)}&backgroundColor=76B900&fontFamily=Ubuntu&fontSize=38`}
                   alt={emp.name} className="w-12 h-12 rounded-xl shrink-0"
                 />
                 <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(isExp ? null : emp.id)}>
@@ -105,12 +105,12 @@ export default function EmployeesPage() {
               </div>
 
               {isExp && emp.projectMembers?.length > 0 && (
-                <div className="px-4 pb-4" style={{ borderTop: '1px solid #1E2A1E' }}>
+                <div className="px-4 pb-4" style={{ borderTop: '1px solid #212121' }}>
                   <p className="text-xs text-gray-600 uppercase tracking-wide mt-3 mb-2">Проекты</p>
                   <div className="space-y-1.5">
                     {emp.projectMembers.map(m => (
                       <div key={m.id} className="flex items-center justify-between p-2.5 rounded-lg text-sm"
-                        style={{ background: '#111A14', border: '1px solid #1E2A1E' }}>
+                        style={{ background: '#0F0F0F', border: '1px solid #212121' }}>
                         <div className="flex items-center gap-2">
                           <span className="text-gray-300">{m.project?.name}</span>
                           {m.project?.status && <span className={`badge ${PROJECT_STATUS[m.project.status]?.color}`}>{PROJECT_STATUS[m.project.status]?.label}</span>}
