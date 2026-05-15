@@ -6,7 +6,9 @@ import { Target, Plus, Pencil, Trash2, ArrowRightCircle, LayoutList, Columns3 } 
 import { useSync } from '../hooks/useSync';
 import { PhoneInput } from '../components/FormInputs';
 
-const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', notes: '', lastContactDate: '' };
+const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', tzAuthor: '', prepayment: '', notes: '', lastContactDate: '' };
+
+const toDateInput = (d) => d.toISOString().split('T')[0];
 
 const LEAD_COLUMNS = [
   { key: 'thinking',       label: 'Обдумывает',     emoji: '🤔' },
@@ -28,13 +30,36 @@ function LeadForm({ initial, onSave, onCancel }) {
         <div><label className="label">Email</label><input type="email" className="input" value={form.email} onChange={e => set('email', e.target.value)} /></div>
       </div>
       <div><label className="label">Компания</label><input className="input" value={form.company} onChange={e => set('company', e.target.value)} /></div>
-      <div>
-        <label className="label">Статус</label>
-        <select className="input" value={form.status} onChange={e => set('status', e.target.value)}>
-          {Object.entries(LEAD_STATUS).filter(([k]) => k !== 'converted').map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-        </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="label">Статус</label>
+          <select className="input" value={form.status} onChange={e => set('status', e.target.value)}>
+            {Object.entries(LEAD_STATUS).filter(([k]) => k !== 'converted').map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="label">Кто составляет ТЗ</label>
+          <select className="input" value={form.tzAuthor} onChange={e => set('tzAuthor', e.target.value)}>
+            <option value="">— не выбрано —</option>
+            <option value="studio">Мы (студия)</option>
+            <option value="client">Заказчик</option>
+          </select>
+        </div>
       </div>
-      <div><label className="label">Последний контакт</label><input type="date" className="input" value={form.lastContactDate} onChange={e => set('lastContactDate', e.target.value)} /></div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="label">Предоплата</label>
+          <input type="number" className="input" placeholder="0" value={form.prepayment} onChange={e => set('prepayment', e.target.value)} />
+        </div>
+        <div>
+          <label className="label">Последний контакт</label>
+          <div className="flex gap-1.5">
+            <input type="date" className="input flex-1" value={form.lastContactDate} onChange={e => set('lastContactDate', e.target.value)} />
+            <button type="button" onClick={() => set('lastContactDate', toDateInput(new Date()))} className="btn-secondary px-2.5 text-xs whitespace-nowrap">Сегодня</button>
+            <button type="button" onClick={() => { const d = new Date(); d.setDate(d.getDate() - 1); set('lastContactDate', toDateInput(d)); }} className="btn-secondary px-2.5 text-xs whitespace-nowrap">Вчера</button>
+          </div>
+        </div>
+      </div>
       <div><label className="label">Заметки</label><textarea className="input resize-none" rows={3} value={form.notes} onChange={e => set('notes', e.target.value)} /></div>
       <div className="flex justify-end gap-3 pt-1">
         <button type="button" onClick={onCancel} className="btn-secondary">Отмена</button>
@@ -51,6 +76,10 @@ function LeadCard({ lead, onEdit, onDelete, onConvert }) {
       {lead.company && <p className="text-xs text-gray-600 mt-0.5">{lead.company}</p>}
       {lead.phone && <p className="text-xs text-gray-600 mt-1">📞 {lead.phone}</p>}
       {lead.lastContactDate && <p className="text-xs text-gray-600 mt-0.5">🕐 {formatDate(lead.lastContactDate)}</p>}
+      <div className="flex flex-wrap gap-1.5 mt-1.5">
+        {lead.tzAuthor && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">📋 ТЗ: {lead.tzAuthor === 'studio' ? 'Мы' : 'Заказчик'}</span>}
+        {lead.prepayment > 0 && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">💰 {lead.prepayment.toLocaleString('ru')} ₸</span>}
+      </div>
       {lead.notes && <p className="text-xs text-gray-600 mt-1 line-clamp-2 italic">{lead.notes}</p>}
       <div className="flex gap-2 mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
         <button onClick={onEdit} className="text-xs text-gray-500 hover:text-primary-400 flex items-center gap-1"><Pencil size={11} /> Изменить</button>

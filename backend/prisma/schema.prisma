@@ -35,6 +35,8 @@ model Lead {
   email           String?
   company         String?
   status          String   @default("thinking") // thinking | needs_tz | waiting_prepay | rejected | converted
+  tzAuthor        String?  // client | studio
+  prepayment      Float?
   notes           String?
   lastContactDate DateTime?
   createdAt       DateTime @default(now())

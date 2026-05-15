@@ -19,11 +19,13 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, phone, email, company, status, notes, lastContactDate } = req.body;
+    const { name, phone, email, company, status, notes, lastContactDate, tzAuthor, prepayment } = req.body;
     const lead = await prisma.lead.create({
       data: {
         name, phone, email, company,
         status: status || 'thinking',
+        tzAuthor: tzAuthor || null,
+        prepayment: prepayment ? parseFloat(prepayment) : null,
         notes,
         lastContactDate: lastContactDate ? new Date(lastContactDate) : null,
       },
@@ -37,11 +39,13 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const { name, phone, email, company, status, notes, lastContactDate } = req.body;
+    const { name, phone, email, company, status, notes, lastContactDate, tzAuthor, prepayment } = req.body;
     const lead = await prisma.lead.update({
       where: { id: Number(req.params.id) },
       data: {
         name, phone, email, company, status, notes,
+        tzAuthor: tzAuthor || null,
+        prepayment: prepayment ? parseFloat(prepayment) : null,
         lastContactDate: lastContactDate ? new Date(lastContactDate) : null,
       },
     });
