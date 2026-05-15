@@ -12,7 +12,7 @@ router.get('/dashboard', async (req, res) => {
     const now = new Date();
     const in5Days = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
 
-    const [activeProjects, urgentDeadlines, totalDebt, newLeads, totalRevenue] = await Promise.all([
+    const [activeProjects, urgentDeadlines, totalDebt, newLeads, totalTxRevenue, totalPrepayments] = await Promise.all([
       prisma.project.count({ where: { status: { not: 'completed' } } }),
       prisma.project.findMany({
         where: {
@@ -31,16 +31,20 @@ router.get('/dashboard', async (req, res) => {
         where: { type: 'income' },
         _sum: { amount: true },
       }),
+      prisma.project.aggregate({
+        _sum: { prepayment: true },
+      }),
     ]);
 
     const debt = (totalDebt._sum.budget || 0) - (totalDebt._sum.prepayment || 0);
+    const totalRevenue = (totalTxRevenue._sum.amount || 0) + (totalPrepayments._sum.prepayment || 0);
 
     res.json({
       activeProjects,
       urgentDeadlines,
       expectedPayments: debt,
       newLeads,
-      totalRevenue: totalRevenue._sum.amount || 0,
+      totalRevenue,
     });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -59,12 +63,20 @@ router.get('/monthly', async (req, res) => {
     const taxSetting = await prisma.settings.findUnique({ where: { key: 'tax_rate' } });
     const taxRate = taxSetting ? parseFloat(taxSetting.value) : 0;
 
-    const [income, expenseData, newLeads, closedProjects, activeProjects] = await Promise.all([
+    const [income, prepaymentData, expenseData, salaryData, newLeads, closedProjects, activeProjects] = await Promise.all([
       prisma.transaction.aggregate({
         where: { type: 'income', date: { gte: from, lte: to } },
         _sum: { amount: true },
       }),
+      prisma.project.aggregate({
+        where: { createdAt: { gte: from, lte: to } },
+        _sum: { prepayment: true },
+      }),
       prisma.expense.aggregate({
+        where: { date: { gte: from, lte: to } },
+        _sum: { amount: true },
+      }),
+      prisma.salaryPayment.aggregate({
         where: { date: { gte: from, lte: to } },
         _sum: { amount: true },
       }),
@@ -73,31 +85,21 @@ router.get('/monthly', async (req, res) => {
       prisma.project.count({ where: { status: { not: 'completed' } } }),
     ]);
 
-    const revenue = income._sum.amount || 0;
+    const txRevenue = income._sum.amount || 0;
+    const prepayments = prepaymentData._sum.prepayment || 0;
+    const revenue = txRevenue + prepayments;
     const expenses = expenseData._sum.amount || 0;
+    const salaryTotal = salaryData._sum.amount || 0;
     const tax = (revenue * taxRate) / 100;
-    const netProfit = revenue - tax - expenses;
-
-    // Salary total from active projects for the month
-    const projects = await prisma.project.findMany({
-      where: { updatedAt: { gte: from, lte: to } },
-      include: { members: true },
-    });
-
-    let salaryTotal = 0;
-    for (const p of projects) {
-      const distrib = p.budget * (1 - taxRate / 100);
-      for (const m of p.members) {
-        salaryTotal += (distrib * m.percent) / 100;
-      }
-    }
+    const netProfit = revenue - tax - expenses - salaryTotal;
 
     res.json({
       revenue,
+      taxRate,
       tax,
       expenses,
       salaryTotal,
-      netProfit: netProfit - salaryTotal,
+      netProfit,
       newLeads,
       closedProjects,
       activeProjects,

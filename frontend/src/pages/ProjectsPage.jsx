@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { projectsApi, clientsApi, employeesApi } from '../api/client';
-import { formatDate, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_PRIORITY, PROJECT_STAGE } from '../utils/helpers';
+import { formatDate, formatDateShort, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_PRIORITY, PROJECT_STAGE } from '../utils/helpers';
 import Modal from '../components/Modal';
 import { Plus, Pencil, Trash2, FolderKanban, Search } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
@@ -290,11 +290,17 @@ export default function ProjectsPage() {
                       </div>
 
                       {(p.startDate || p.deadline) && (
-                        <div className="flex gap-4 mt-1 text-xs text-gray-600 font-mono">
-                          {p.startDate && <span>{formatDate(p.startDate)}</span>}
+                        <div className="flex gap-4 mt-1 text-xs text-gray-600">
+                          {p.startDate && (
+                            <span>
+                              <span className="font-mono">{formatDate(p.startDate)}</span>
+                              <span className="text-gray-700"> · {formatDateShort(p.startDate)}</span>
+                            </span>
+                          )}
                           {p.deadline && (
                             <span className={isOverdue ? 'text-red-400 font-bold' : ''}>
-                              → {formatDate(p.deadline)}
+                              → <span className="font-mono">{formatDate(p.deadline)}</span>
+                              <span className={isOverdue ? 'text-red-300 font-normal' : 'text-gray-700'}> · {formatDateShort(p.deadline)}</span>
                               {days !== null && p.status !== 'completed' && ` (${days >= 0 ? days + 'д' : 'просрочен ' + Math.abs(days) + 'д'})`}
                             </span>
                           )}

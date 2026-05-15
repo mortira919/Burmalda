@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projectsApi, financeApi } from '../api/client';
-import { formatDate, formatMoney, PROJECT_STATUS, PROJECT_PRIORITY, EMPLOYEE_ROLE, ROLE_COLOR } from '../utils/helpers';
+import { formatDate, formatDateShort, formatMoney, PROJECT_STATUS, PROJECT_PRIORITY, EMPLOYEE_ROLE, ROLE_COLOR } from '../utils/helpers';
 import { ArrowLeft, ExternalLink, Receipt, Users2, Wallet } from 'lucide-react';
 
 export default function ProjectDetailPage() {
@@ -46,12 +46,15 @@ export default function ProjectDetailPage() {
           </h2>
           <div className="space-y-2.5 text-sm">
             {[
-              ['Начало', formatDate(project.startDate)],
-              ['Дедлайн', formatDate(project.deadline)],
-            ].map(([l, v]) => (
+              ['Начало', project.startDate],
+              ['Дедлайн', project.deadline],
+            ].map(([l, d]) => (
               <div key={l} className="flex justify-between items-center">
                 <span className="text-gray-600">{l}</span>
-                <span className="text-gray-300 font-mono">{v}</span>
+                <div className="text-right">
+                  <p className="text-gray-300 font-mono">{formatDate(d)}</p>
+                  {d && <p className="text-xs text-gray-600">{formatDateShort(d)}</p>}
+                </div>
               </div>
             ))}
             {project.docLink && (
@@ -188,6 +191,7 @@ export default function ProjectDetailPage() {
                     {t.type === 'income' ? '+' : '-'}{formatMoney(t.amount)}
                   </p>
                   <p className="text-xs text-gray-600 font-mono">{formatDate(t.date)}</p>
+                  <p className="text-xs text-gray-700">{formatDateShort(t.date)}</p>
                 </div>
               </div>
             ))}

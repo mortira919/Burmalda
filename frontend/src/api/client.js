@@ -55,6 +55,8 @@ export const employeesApi = {
   create: (data) => api.post('/employees', data),
   update: (id, data) => api.put(`/employees/${id}`, data),
   delete: (id) => api.delete(`/employees/${id}`),
+  addSalaryPayment: (data) => api.post('/employees/salary-payments', data),
+  deleteSalaryPayment: (id) => api.delete(`/employees/salary-payments/${id}`),
 };
 
 export const financeApi = {

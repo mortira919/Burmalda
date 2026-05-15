@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState, useCallback } from 'react';
 import { financeApi, projectsApi } from '../api/client';
-import { formatDate, formatMoney, EXPENSE_CATEGORY } from '../utils/helpers';
+import { formatDate, formatDateShort, formatMoney, EXPENSE_CATEGORY } from '../utils/helpers';
 import Modal from '../components/Modal';
 import { Wallet, Plus, Trash2, TrendingUp, TrendingDown, Scale } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
@@ -91,7 +91,9 @@ export default function FinancePage() {
   const handleAddExp  = async (form) => { await financeApi.createExpense(form); load(); setModal(null); };
   const handleDelExp  = async (id)  => { if (!confirm('Удалить?')) return; await financeApi.deleteExpense(id); load(); };
 
-  const totalIncome   = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const totalTxIncome   = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const totalPrepayments = projects.reduce((s, p) => s + (p.prepayment || 0), 0);
+  const totalIncome   = totalTxIncome + totalPrepayments;
   const totalExpTx    = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
   const balance       = totalIncome - totalExpenses - totalExpTx;
@@ -113,15 +115,16 @@ export default function FinancePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { icon: TrendingUp, label: 'Общий доход', value: formatMoney(totalIncome), color: 'text-green-400', bg: 'rgba(74,222,128,0.1)' },
+          { icon: TrendingUp, label: 'Общий доход', value: formatMoney(totalIncome), sub: `Транзакции ${formatMoney(totalTxIncome)} + предоплаты ${formatMoney(totalPrepayments)}`, color: 'text-green-400', bg: 'rgba(74,222,128,0.1)' },
           { icon: TrendingDown, label: 'Расходы', value: formatMoney(totalExpenses + totalExpTx), color: 'text-red-400', bg: 'rgba(239,68,68,0.1)' },
           { icon: Scale, label: 'Баланс', value: formatMoney(balance), color: balance >= 0 ? 'text-white' : 'text-red-400', bg: 'rgba(118,185,0,0.1)' },
-        ].map(({ icon: Icon, label, value, color, bg }) => (
+        ].map(({ icon: Icon, label, value, sub, color, bg }) => (
           <div key={label} className="stat-card">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
                 <p className={`text-2xl font-bold font-mono mt-2 ${color}`}>{value}</p>
+                {sub && <p className="text-xs text-gray-700 mt-1">{sub}</p>}
               </div>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: bg }}>
                 <Icon size={20} className={color} />
@@ -154,7 +157,10 @@ export default function FinancePage() {
                     <td><span className={`badge ${t.type === 'income' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>{t.type === 'income' ? 'Доход' : 'Расход'}</span></td>
                     <td className="text-gray-300">{t.description || '—'}</td>
                     <td className="text-gray-500">{t.project?.name || '—'}</td>
-                    <td className="font-mono text-gray-500">{formatDate(t.date)}</td>
+                    <td>
+                      <p className="font-mono text-gray-500">{formatDate(t.date)}</p>
+                      <p className="text-xs text-gray-700">{formatDateShort(t.date)}</p>
+                    </td>
                     <td className={`text-right font-mono font-semibold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
                       {t.type === 'income' ? '+' : '-'}{formatMoney(t.amount)}
                     </td>
@@ -179,7 +185,10 @@ export default function FinancePage() {
                   <tr key={e.id}>
                     <td><span className="badge bg-white/5 text-gray-400 border border-white/10">{EXPENSE_CATEGORY[e.category] || e.category}</span></td>
                     <td className="text-gray-300">{e.description || '—'}</td>
-                    <td className="font-mono text-gray-500">{formatDate(e.date)}</td>
+                    <td>
+                      <p className="font-mono text-gray-500">{formatDate(e.date)}</p>
+                      <p className="text-xs text-gray-700">{formatDateShort(e.date)}</p>
+                    </td>
                     <td className="text-right font-mono font-semibold text-red-400">−{formatMoney(e.amount)}</td>
                     <td><button onClick={() => handleDelExp(e.id)} className="text-gray-700 hover:text-red-400 transition-colors"><Trash2 size={13} /></button></td>
                   </tr>

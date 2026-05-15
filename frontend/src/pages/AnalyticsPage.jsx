@@ -48,12 +48,13 @@ export default function AnalyticsPage() {
   }, [year, month]);
 
   const barData = data ? [
-    { name: 'Выручка',  amount: data.revenue,             fill: '#76B900' },
-    { name: 'Налог',    amount: data.tax,                  fill: '#f59e0b' },
-    { name: 'Расходы',  amount: data.expenses,             fill: '#ef4444' },
-    { name: 'Зарплата', amount: data.salaryTotal,          fill: '#8b5cf6' },
+    { name: 'Выручка',  amount: data.revenue,                fill: '#76B900' },
+    { name: 'Налог',    amount: data.tax,                    fill: '#f59e0b' },
+    { name: 'Расходы',  amount: data.expenses,               fill: '#ef4444' },
+    { name: 'Зарплата', amount: data.salaryTotal,            fill: '#8b5cf6' },
     { name: 'Прибыль',  amount: Math.max(0, data.netProfit), fill: '#10b981' },
   ] : [];
+
 
   const pieData = data ? [
     { name: 'Налог',    value: data.tax },

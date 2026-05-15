@@ -6,6 +6,11 @@ export function formatDate(date) {
   return format(typeof date === 'string' ? parseISO(date) : date, 'dd.MM.yyyy', { locale: ru });
 }
 
+export function formatDateShort(date) {
+  if (!date) return '—';
+  return format(typeof date === 'string' ? parseISO(date) : date, 'd MMMM', { locale: ru });
+}
+
 export function formatMoney(amount, currency = '₸') {
   if (amount === null || amount === undefined) return '—';
   return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(amount) + ' ' + currency;

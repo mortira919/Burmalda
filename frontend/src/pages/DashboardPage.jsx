@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { analyticsApi, projectsApi } from '../api/client';
-import { formatDate, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_STAGE } from '../utils/helpers';
+import { formatDate, formatDateShort, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_STAGE } from '../utils/helpers';
 import { FolderKanban, Clock, Banknote, Target, TrendingUp, Plus, AlertTriangle } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
 
@@ -156,7 +156,8 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-xs text-gray-600">Дедлайн</p>
-                  <p className="text-sm font-medium text-gray-300">{formatDate(p.deadline)}</p>
+                  <p className="text-sm font-medium text-gray-300 font-mono">{formatDate(p.deadline)}</p>
+                  <p className="text-xs text-gray-600">{formatDateShort(p.deadline)}</p>
                   <div className="mt-1"><DeadlineBadge deadline={p.deadline} /></div>
                 </div>
               </div>
