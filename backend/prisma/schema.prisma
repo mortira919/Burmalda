@@ -39,6 +39,7 @@ model Lead {
   prepayment      Float?
   notes           String?
   lastContactDate DateTime?
+  followUpDate    DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

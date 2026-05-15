@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, phone, email, company, status, notes, lastContactDate, tzAuthor, prepayment } = req.body;
+    const { name, phone, email, company, status, notes, lastContactDate, followUpDate, tzAuthor, prepayment } = req.body;
     const lead = await prisma.lead.create({
       data: {
         name, phone, email, company,
@@ -28,6 +28,7 @@ router.post('/', async (req, res) => {
         prepayment: prepayment ? parseFloat(prepayment) : null,
         notes,
         lastContactDate: lastContactDate ? new Date(lastContactDate) : null,
+        followUpDate: followUpDate ? new Date(followUpDate) : null,
       },
     });
     socket.emit('data:changed', { type: 'lead' });
@@ -39,7 +40,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const { name, phone, email, company, status, notes, lastContactDate, tzAuthor, prepayment } = req.body;
+    const { name, phone, email, company, status, notes, lastContactDate, followUpDate, tzAuthor, prepayment } = req.body;
     const lead = await prisma.lead.update({
       where: { id: Number(req.params.id) },
       data: {
@@ -47,6 +48,7 @@ router.put('/:id', async (req, res) => {
         tzAuthor: tzAuthor || null,
         prepayment: prepayment ? parseFloat(prepayment) : null,
         lastContactDate: lastContactDate ? new Date(lastContactDate) : null,
+        followUpDate: followUpDate ? new Date(followUpDate) : null,
       },
     });
     socket.emit('data:changed', { type: 'lead' });

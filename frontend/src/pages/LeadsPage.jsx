@@ -6,7 +6,7 @@ import { Target, Plus, Pencil, Trash2, ArrowRightCircle, LayoutList, Columns3 } 
 import { useSync } from '../hooks/useSync';
 import { PhoneInput } from '../components/FormInputs';
 
-const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', tzAuthor: '', prepayment: '', notes: '', lastContactDate: '' };
+const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', tzAuthor: '', prepayment: '', notes: '', lastContactDate: '', followUpDate: '' };
 
 const toDateInput = (d) => d.toISOString().split('T')[0];
 
@@ -60,6 +60,17 @@ function LeadForm({ initial, onSave, onCancel }) {
           </div>
         </div>
       </div>
+      <div>
+        <label className="label">Когда связаться</label>
+        <div className="flex gap-1.5">
+          <input type="date" className="input flex-1" value={form.followUpDate} onChange={e => set('followUpDate', e.target.value)} />
+          {[1, 2, 3, 5, 10].map(n => (
+            <button key={n} type="button"
+              onClick={() => { const d = new Date(); d.setDate(d.getDate() + n); set('followUpDate', toDateInput(d)); }}
+              className="btn-secondary px-2 text-xs whitespace-nowrap">+{n}</button>
+          ))}
+        </div>
+      </div>
       <div><label className="label">Заметки</label><textarea className="input resize-none" rows={3} value={form.notes} onChange={e => set('notes', e.target.value)} /></div>
       <div className="flex justify-end gap-3 pt-1">
         <button type="button" onClick={onCancel} className="btn-secondary">Отмена</button>
@@ -76,6 +87,11 @@ function LeadCard({ lead, onEdit, onDelete, onConvert }) {
       {lead.company && <p className="text-xs text-gray-600 mt-0.5">{lead.company}</p>}
       {lead.phone && <p className="text-xs text-gray-600 mt-1">📞 {lead.phone}</p>}
       {lead.lastContactDate && <p className="text-xs text-gray-600 mt-0.5">🕐 {formatDate(lead.lastContactDate)}</p>}
+      {lead.followUpDate && (() => {
+        const due = new Date(lead.followUpDate);
+        const overdue = due < new Date();
+        return <p className={`text-xs mt-0.5 font-medium ${overdue ? 'text-red-400' : 'text-yellow-500'}`}>📅 {overdue ? 'Просрочено: ' : 'Связаться: '}{formatDate(lead.followUpDate)}</p>;
+      })()}
       <div className="flex flex-wrap gap-1.5 mt-1.5">
         {lead.tzAuthor && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">📋 ТЗ: {lead.tzAuthor === 'studio' ? 'Мы' : 'Заказчик'}</span>}
         {lead.prepayment > 0 && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">💰 {lead.prepayment.toLocaleString('ru')} ₸</span>}
