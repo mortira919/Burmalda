@@ -31,6 +31,9 @@ export const projectsApi = {
   update: (id, data) => api.put(`/projects/${id}`, data),
   patch: (id, data) => api.patch(`/projects/${id}`, data),
   delete: (id) => api.delete(`/projects/${id}`),
+  addPayment: (id, data) => api.post(`/projects/${id}/payments`, data),
+  patchPayment: (id, paymentId, data) => api.patch(`/projects/${id}/payments/${paymentId}`, data),
+  deletePayment: (id, paymentId) => api.delete(`/projects/${id}/payments/${paymentId}`),
 };
 
 export const clientsApi = {

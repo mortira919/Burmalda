@@ -145,16 +145,25 @@ export default function EmployeesPage() {
                       <div className="space-y-1.5">
                         {emp.projectMembers.map(m => {
                           const projTotal = (m.project?.budget || 0) + (m.project?.extraCost || 0);
+                          const accrued = projTotal * m.percent / 100;
+                          const paidForProject = emp.salaryPayments
+                            ?.filter(p => p.projectId === m.project?.id)
+                            .reduce((s, p) => s + p.amount, 0) || 0;
+                          const owedForProject = Math.max(0, accrued - paidForProject);
                           return (
-                            <div key={m.id} className="flex items-center justify-between p-2.5 rounded-lg text-sm"
+                            <div key={m.id} className="p-2.5 rounded-lg text-sm"
                               style={{ background: '#0F0F0F', border: '1px solid #212121' }}>
-                              <div className="flex items-center gap-2">
-                                <span className="text-gray-300">{m.project?.name}</span>
-                                {m.project?.status && <span className={`badge ${PROJECT_STATUS[m.project.status]?.color}`}>{PROJECT_STATUS[m.project.status]?.label}</span>}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-gray-300">{m.project?.name}</span>
+                                  {m.project?.status && <span className={`badge ${PROJECT_STATUS[m.project.status]?.color}`}>{PROJECT_STATUS[m.project.status]?.label}</span>}
+                                </div>
+                                <span className="text-gray-600 font-mono text-xs">{m.percent}%</span>
                               </div>
-                              <div className="flex items-center gap-2 font-mono text-xs">
-                                <span className="text-gray-600">{m.percent}%</span>
-                                <span className="text-yellow-400">{formatMoney(projTotal * m.percent / 100)}</span>
+                              <div className="flex gap-3 mt-1.5 font-mono text-xs">
+                                <span className="text-gray-600">Начислено: <span className="text-yellow-400">{formatMoney(accrued)}</span></span>
+                                <span className="text-gray-600">Выплачено: <span className="text-green-400">{formatMoney(paidForProject)}</span></span>
+                                {owedForProject > 0.01 && <span className="text-gray-600">Ещё: <span className="text-orange-400">{formatMoney(owedForProject)}</span></span>}
                               </div>
                             </div>
                           );

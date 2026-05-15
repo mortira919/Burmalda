@@ -55,15 +55,27 @@ model Employee {
   updatedAt       DateTime          @updatedAt
 }
 
-model SalaryPayment {
-  id          Int      @id @default(autoincrement())
-  employeeId  Int
-  projectId   Int?
-  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+model ProjectPayment {
+  id          Int       @id @default(autoincrement())
+  projectId   Int
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   amount      Float
-  date        DateTime @default(now())
-  notes       String?
-  createdAt   DateTime @default(now())
+  description String?
+  status      String    @default("pending") // pending | paid
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model SalaryPayment {
+  id               Int      @id @default(autoincrement())
+  employeeId       Int
+  projectId        Int?
+  projectPaymentId Int?
+  employee         Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  amount           Float
+  date             DateTime @default(now())
+  notes            String?
+  createdAt        DateTime @default(now())
 }
 
 model Project {
@@ -83,6 +95,7 @@ model Project {
   stage         String            @default("design")
   members       ProjectEmployee[]
   transactions  Transaction[]
+  payments      ProjectPayment[]
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 }
