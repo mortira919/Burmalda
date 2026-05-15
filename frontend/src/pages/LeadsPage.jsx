@@ -4,6 +4,7 @@ import { formatDate, LEAD_STATUS } from '../utils/helpers';
 import Modal from '../components/Modal';
 import { Target, Plus, Pencil, Trash2, ArrowRightCircle, LayoutList, Columns3 } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
+import { PhoneInput } from '../components/FormInputs';
 
 const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', notes: '', lastContactDate: '' };
 
@@ -23,7 +24,7 @@ function LeadForm({ initial, onSave, onCancel }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div><label className="label">Имя / Название *</label><input className="input" required value={form.name} onChange={e => set('name', e.target.value)} /></div>
       <div className="grid grid-cols-2 gap-4">
-        <div><label className="label">Телефон</label><input className="input" value={form.phone} onChange={e => set('phone', e.target.value)} /></div>
+        <div><label className="label">Телефон</label><PhoneInput value={form.phone} onChange={v => set('phone', v)} /></div>
         <div><label className="label">Email</label><input type="email" className="input" value={form.email} onChange={e => set('email', e.target.value)} /></div>
       </div>
       <div><label className="label">Компания</label><input className="input" value={form.company} onChange={e => set('company', e.target.value)} /></div>

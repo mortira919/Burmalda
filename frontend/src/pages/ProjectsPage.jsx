@@ -5,27 +5,13 @@ import { formatDate, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_PRIORITY, P
 import Modal from '../components/Modal';
 import { Plus, Pencil, Trash2, FolderKanban, Search } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
+import { MoneyInput } from '../components/FormInputs';
 
 const emptyForm = {
   name: '', clientId: '', status: 'development', priority: 'medium',
   startDate: '', deadline: '', budget: '', extraCost: '', prepayment: '', docLink: '', notes: '', stage: 'design', members: [],
 };
 
-function formatThousands(val) {
-  const num = String(val).replace(/\D/g, '');
-  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-}
-
-function MoneyInput({ value, onChange, placeholder }) {
-  const [display, setDisplay] = React.useState(value ? formatThousands(value) : '');
-  React.useEffect(() => { setDisplay(value ? formatThousands(value) : ''); }, [value]);
-  const handleChange = (e) => {
-    const raw = e.target.value.replace(/\D/g, '');
-    setDisplay(raw ? formatThousands(raw) : '');
-    onChange(raw);
-  };
-  return <input type="text" inputMode="numeric" className="input" value={display} onChange={handleChange} placeholder={placeholder || '0'} />;
-}
 
 function QuickSelect({ value, options, colorMap, onSelect }) {
   const [open, setOpen] = useState(false);

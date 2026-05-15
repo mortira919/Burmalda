@@ -4,6 +4,7 @@ import { formatMoney, EMPLOYEE_ROLE, ROLE_COLOR, PROJECT_STATUS } from '../utils
 import Modal from '../components/Modal';
 import { UserCheck, Plus, Pencil, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
+import { PhoneInput } from '../components/FormInputs';
 
 const emptyForm = { name: '', role: 'mobile', defaultPercent: '', phone: '', email: '', notes: '' };
 
@@ -23,7 +24,7 @@ function EmployeeForm({ initial, onSave, onCancel }) {
           </select>
         </div>
         <div><label className="label">% по умолчанию</label><input type="number" min="0" max="100" className="input font-mono" value={form.defaultPercent} onChange={e => set('defaultPercent', e.target.value)} /></div>
-        <div><label className="label">Телефон</label><input className="input" value={form.phone} onChange={e => set('phone', e.target.value)} /></div>
+        <div><label className="label">Телефон</label><PhoneInput value={form.phone} onChange={v => set('phone', v)} /></div>
         <div><label className="label">Email</label><input type="email" className="input" value={form.email} onChange={e => set('email', e.target.value)} /></div>
       </div>
       <div><label className="label">Заметки</label><textarea className="input resize-none" rows={2} value={form.notes} onChange={e => set('notes', e.target.value)} /></div>

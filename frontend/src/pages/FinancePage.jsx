@@ -4,6 +4,7 @@ import { formatDate, formatMoney, EXPENSE_CATEGORY } from '../utils/helpers';
 import Modal from '../components/Modal';
 import { Wallet, Plus, Trash2, TrendingUp, TrendingDown, Scale } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
+import { MoneyInput } from '../components/FormInputs';
 
 function TransactionForm({ projects, onSave, onCancel }) {
   const [form, setForm] = useState({ projectId: '', type: 'income', amount: '', description: '', date: new Date().toISOString().split('T')[0] });
@@ -33,7 +34,7 @@ function TransactionForm({ projects, onSave, onCancel }) {
           {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
       </div>
-      <div><label className="label">Сумма (₸) *</label><input type="number" className="input font-mono" required value={form.amount} onChange={e => set('amount', e.target.value)} /></div>
+      <div><label className="label">Сумма (₸) *</label><MoneyInput required value={form.amount} onChange={v => set('amount', v)} placeholder="100 000" /></div>
       <div><label className="label">Описание</label><input className="input" value={form.description} onChange={e => set('description', e.target.value)} /></div>
       <div><label className="label">Дата</label><input type="date" className="input" value={form.date} onChange={e => set('date', e.target.value)} /></div>
       <div className="flex justify-end gap-3 pt-1">
@@ -57,7 +58,7 @@ function ExpenseForm({ onSave, onCancel }) {
           {Object.entries(EXPENSE_CATEGORY).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
       </div>
-      <div><label className="label">Сумма (₸) *</label><input type="number" className="input font-mono" required value={form.amount} onChange={e => set('amount', e.target.value)} /></div>
+      <div><label className="label">Сумма (₸) *</label><MoneyInput required value={form.amount} onChange={v => set('amount', v)} placeholder="100 000" /></div>
       <div><label className="label">Описание</label><input className="input" value={form.description} onChange={e => set('description', e.target.value)} /></div>
       <div><label className="label">Дата</label><input type="date" className="input" value={form.date} onChange={e => set('date', e.target.value)} /></div>
       <div className="flex justify-end gap-3 pt-1">
