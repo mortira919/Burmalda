@@ -15,7 +15,6 @@ const toDateInput = (d) => d.toISOString().split('T')[0];
 const LEAD_COLUMNS = [
   { key: 'thinking',       label: 'Обдумывает',     emoji: '🤔' },
   { key: 'needs_tz',       label: 'Нужно ТЗ',        emoji: '📋' },
-  { key: 'waiting_prepay', label: 'Ждёт предоплату', emoji: '💳' },
   { key: 'rejected',       label: 'Отказ',           emoji: '❌' },
 ];
 

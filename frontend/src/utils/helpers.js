@@ -45,7 +45,6 @@ export const PROJECT_STAGE = {
 export const LEAD_STATUS = {
   thinking:      { label: 'Обдумывает',         color: 'bg-gray-500/20 text-gray-400 border border-gray-500/30' },
   needs_tz:      { label: 'Нужно ТЗ',           color: 'bg-blue-500/20 text-blue-400 border border-blue-500/30' },
-  waiting_prepay:{ label: 'Ждёт предоплату',    color: 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' },
   rejected:      { label: 'Отказ',              color: 'bg-red-500/20 text-red-400 border border-red-500/30' },
   converted:     { label: 'Переведён',          color: 'bg-green-500/20 text-green-400 border border-green-500/30' },
 };
