@@ -50,12 +50,14 @@ export default function Layout() {
 
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 h-16 shrink-0" style={{ borderBottom: '1px solid #1E2A1E' }}>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shrink-0"
             style={{ background: 'linear-gradient(135deg,#16a34a,#77216F)' }}>
-            <span className="text-white font-bold text-sm">S</span>
+            <svg width="18" height="13" viewBox="0 0 36 26" fill="none">
+              <path d="M2 2L9 24L18 8L27 24L34 2" stroke="white" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
           <div>
-            <p className="text-white font-semibold text-sm leading-none">Studio CRM</p>
+            <p className="text-white font-semibold text-sm leading-none">WorkWork Studio</p>
             <p className="text-gray-600 text-xs mt-0.5">Управление студией</p>
           </div>
           <button className="ml-auto lg:hidden text-gray-500 hover:text-white" onClick={() => setSidebarOpen(false)}>

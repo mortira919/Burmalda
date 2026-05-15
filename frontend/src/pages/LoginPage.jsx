@@ -1,7 +1,15 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Terminal } from 'lucide-react';
+import { LogIn } from 'lucide-react';
+
+function WLogo({ size = 28 }) {
+  return (
+    <svg width={size} height={size * 0.72} viewBox="0 0 36 26" fill="none">
+      <path d="M2 2L9 24L18 8L27 24L34 2" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -25,7 +33,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#1C1C1C' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#111A14' }}>
       {/* BG pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-10"
@@ -39,9 +47,9 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
             style={{ background: 'linear-gradient(135deg, #16a34a 0%, #77216F 100%)' }}>
-            <Terminal size={28} className="text-white" />
+            <WLogo size={30} />
           </div>
-          <h1 className="text-2xl font-bold text-white">Studio CRM</h1>
+          <h1 className="text-2xl font-bold text-white">WorkWork Studio</h1>
           <p className="text-gray-500 text-sm mt-1">Войдите для продолжения</p>
         </div>
 
