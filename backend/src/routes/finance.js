@@ -119,8 +119,9 @@ router.get('/salary/:projectId', async (req, res) => {
     });
     if (!project) return res.status(404).json({ error: 'Проект не найден' });
 
-    const tax = (project.budget * taxRate) / 100;
-    const distributable = project.budget - tax;
+    const total = project.budget + (project.extraCost || 0);
+    const tax = (total * taxRate) / 100;
+    const distributable = total - tax;
 
     const breakdown = project.members.map(m => ({
       employee: m.employee,
@@ -132,6 +133,8 @@ router.get('/salary/:projectId', async (req, res) => {
 
     res.json({
       budget: project.budget,
+      extraCost: project.extraCost || 0,
+      total,
       taxRate,
       tax,
       distributable,

@@ -64,6 +64,7 @@ model Project {
   startDate     DateTime?
   deadline      DateTime?
   budget        Float             @default(0)
+  extraCost     Float             @default(0)
   prepayment    Float             @default(0)
   docLink       String?
   notes         String?

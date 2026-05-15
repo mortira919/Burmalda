@@ -56,7 +56,7 @@ router.patch('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, clientId, status, priority, startDate, deadline, budget, prepayment, docLink, notes, stage, members } = req.body;
+    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, docLink, notes, stage, members } = req.body;
 
     const project = await prisma.project.create({
       data: {
@@ -67,6 +67,7 @@ router.post('/', async (req, res) => {
         startDate: startDate ? new Date(startDate) : null,
         deadline: deadline ? new Date(deadline) : null,
         budget: parseFloat(budget) || 0,
+        extraCost: parseFloat(extraCost) || 0,
         prepayment: parseFloat(prepayment) || 0,
         docLink,
         notes,
@@ -92,7 +93,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const { name, clientId, status, priority, startDate, deadline, budget, prepayment, docLink, notes, stage, members } = req.body;
+    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, docLink, notes, stage, members } = req.body;
     const id = Number(req.params.id);
 
     await prisma.projectEmployee.deleteMany({ where: { projectId: id } });
@@ -107,6 +108,7 @@ router.put('/:id', async (req, res) => {
         startDate: startDate ? new Date(startDate) : null,
         deadline: deadline ? new Date(deadline) : null,
         budget: parseFloat(budget) || 0,
+        extraCost: parseFloat(extraCost) || 0,
         prepayment: parseFloat(prepayment) || 0,
         docLink,
         notes,

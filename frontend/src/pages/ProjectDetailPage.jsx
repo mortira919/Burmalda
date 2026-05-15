@@ -19,7 +19,8 @@ export default function ProjectDetailPage() {
   if (loading) return <div className="flex justify-center py-32"><div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" /></div>;
   if (!project)  return <div className="card text-center py-20 text-gray-600">Проект не найден</div>;
 
-  const balance = project.budget - project.prepayment;
+  const total = project.budget + (project.extraCost || 0);
+  const balance = total - project.prepayment;
 
   return (
     <div className="space-y-5 max-w-4xl">
@@ -82,6 +83,18 @@ export default function ProjectDetailPage() {
               <span className="text-gray-600">Бюджет</span>
               <span className="text-white font-mono font-bold text-base">{formatMoney(project.budget)}</span>
             </div>
+            {project.extraCost > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Доп. работы</span>
+                <span className="text-primary-400 font-mono">+{formatMoney(project.extraCost)}</span>
+              </div>
+            )}
+            {project.extraCost > 0 && (
+              <div className="flex justify-between pt-1" style={{ borderTop: '1px solid #212121' }}>
+                <span className="text-gray-400 font-medium">Итого</span>
+                <span className="text-white font-mono font-semibold">{formatMoney(total)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-gray-600">Предоплата</span>
               <span className="text-green-400 font-mono">{formatMoney(project.prepayment)}</span>
@@ -93,15 +106,15 @@ export default function ProjectDetailPage() {
           </div>
 
           {/* Prepayment bar */}
-          {project.budget > 0 && (
+          {total > 0 && (
             <div>
               <div className="flex justify-between text-xs text-gray-600 mb-1">
                 <span>Оплачено</span>
-                <span className="font-mono">{((project.prepayment / project.budget) * 100).toFixed(0)}%</span>
+                <span className="font-mono">{((project.prepayment / total) * 100).toFixed(0)}%</span>
               </div>
               <div className="h-2 rounded-full overflow-hidden" style={{ background: '#0F0F0F' }}>
                 <div className="h-full rounded-full bg-gradient-to-r from-primary-600 to-primary-400 transition-all"
-                  style={{ width: `${Math.min(100, (project.prepayment / project.budget) * 100)}%` }} />
+                  style={{ width: `${Math.min(100, (project.prepayment / total) * 100)}%` }} />
               </div>
             </div>
           )}
@@ -116,7 +129,7 @@ export default function ProjectDetailPage() {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                ['Бюджет', formatMoney(salary.budget), 'text-white', '#1A1A1A'],
+                [salary.extraCost > 0 ? 'Итого' : 'Бюджет', formatMoney(salary.total ?? salary.budget), 'text-white', '#1A1A1A'],
                 [`Налог ${salary.taxRate}%`, `−${formatMoney(salary.tax)}`, 'text-yellow-400', 'rgba(245,158,11,0.1)'],
                 ['К распределению', formatMoney(salary.distributable), 'text-primary-400', 'rgba(118,185,0,0.1)'],
                 ['Профит студии', formatMoney(salary.companyProfit), 'text-green-400', 'rgba(16,185,129,0.1)'],
