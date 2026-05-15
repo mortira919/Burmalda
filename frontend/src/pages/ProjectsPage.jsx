@@ -264,7 +264,7 @@ export default function ProjectsPage() {
         )}
         {filtered.map(p => {
           const days = daysUntil(p.deadline);
-          const balance = p.budget - p.prepayment;
+          const balance = (p.budget + (p.extraCost || 0)) - p.prepayment;
           const isOverdue = days !== null && days < 0 && p.status !== 'completed';
           const leftColor = isOverdue ? '#ef4444' : p.priority === 'urgent' ? '#f97316' : p.priority === 'high' ? '#fb923c' : '#76B900';
           return (
@@ -283,10 +283,10 @@ export default function ProjectsPage() {
                       </div>
                       {p.client && <p className="text-xs text-gray-600 mt-0.5">👤 {p.client.name}</p>}
 
-                      <div className="flex flex-wrap gap-4 mt-2 text-sm">
-                        <span className="text-gray-400 font-mono">{formatMoney(p.budget)}</span>
-                        {p.prepayment > 0 && <span className="text-green-400 font-mono">+{formatMoney(p.prepayment)}</span>}
-                        {balance > 0 && <span className="text-orange-400 font-mono">−{formatMoney(balance)} остаток</span>}
+                      <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                        <span>Контракт: <span className="text-gray-300 font-mono font-medium">{formatMoney(p.budget + (p.extraCost || 0))}</span></span>
+                        {p.prepayment > 0 && <span>Получено: <span className="text-green-400 font-mono font-medium">{formatMoney(p.prepayment)}</span></span>}
+                        {balance > 0 && <span>Остаток: <span className="text-orange-400 font-mono font-medium">{formatMoney(balance)}</span></span>}
                       </div>
 
                       {(p.startDate || p.deadline) && (

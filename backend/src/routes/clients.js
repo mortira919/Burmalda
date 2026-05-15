@@ -11,7 +11,7 @@ router.use(auth);
 router.get('/', async (req, res) => {
   try {
     const clients = await prisma.client.findMany({
-      include: { projects: { select: { id: true, name: true, status: true, budget: true, prepayment: true } } },
+      include: { projects: { select: { id: true, name: true, status: true, budget: true, extraCost: true, prepayment: true } } },
       orderBy: { createdAt: 'desc' },
     });
     res.json(clients);

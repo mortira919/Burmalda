@@ -80,8 +80,9 @@ export default function ClientsPage() {
           </div>
         )}
         {filtered.map(c => {
-          const totalBudget = c.projects?.reduce((s, p) => s + p.budget, 0) || 0;
-          const totalDebt   = c.projects?.reduce((s, p) => s + Math.max(0, p.budget - p.prepayment), 0) || 0;
+          const totalContract = c.projects?.reduce((s, p) => s + (p.budget || 0) + (p.extraCost || 0), 0) || 0;
+          const totalReceived = c.projects?.reduce((s, p) => s + (p.prepayment || 0), 0) || 0;
+          const totalDebt     = Math.max(0, totalContract - totalReceived);
           const isExp = expanded === c.id;
           return (
             <div key={c.id} className="card p-0 overflow-hidden">
@@ -99,7 +100,8 @@ export default function ClientsPage() {
                     {c.phone && <span>📞 {c.phone}</span>}
                     {c.email && <span>✉️ {c.email}</span>}
                     <span>Проектов: <strong className="text-gray-300">{c.projects?.length || 0}</strong></span>
-                    <span>Принёс: <strong className="text-green-400 font-mono">{formatMoney(totalBudget)}</strong></span>
+                    <span>Контракт: <strong className="text-gray-400 font-mono">{formatMoney(totalContract)}</strong></span>
+                    <span>Получено: <strong className="text-green-400 font-mono">{formatMoney(totalReceived)}</strong></span>
                     {totalDebt > 0 && <span>Долг: <strong className="text-red-400 font-mono">{formatMoney(totalDebt)}</strong></span>}
                   </div>
                 </div>
