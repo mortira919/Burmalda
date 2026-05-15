@@ -8,6 +8,32 @@ const prisma = new PrismaClient();
 
 router.use(auth);
 
+// Distributes `amount` (after tax) among project members as SalaryPayments
+async function autoDistribute(projectId, projectName, amount) {
+  if (amount <= 0) return;
+
+  const [taxSetting, members] = await Promise.all([
+    prisma.settings.findUnique({ where: { key: 'tax_rate' } }),
+    prisma.projectEmployee.findMany({ where: { projectId } }),
+  ]);
+
+  if (!members.length) return;
+
+  const taxRate = taxSetting ? parseFloat(taxSetting.value) : 0;
+  const distributable = amount * (1 - taxRate / 100);
+  const label = `Авто: ${projectName} (+${Math.round(amount).toLocaleString('ru-RU')} ₸)`;
+
+  await prisma.salaryPayment.createMany({
+    data: members.map(m => ({
+      employeeId: m.employeeId,
+      projectId,
+      amount: Math.round((distributable * m.percent / 100) * 100) / 100,
+      date: new Date(),
+      notes: label,
+    })),
+  });
+}
+
 router.get('/', async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
@@ -57,6 +83,7 @@ router.patch('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, docLink, notes, stage, members } = req.body;
+    const prepaymentAmount = parseFloat(prepayment) || 0;
 
     const project = await prisma.project.create({
       data: {
@@ -68,23 +95,23 @@ router.post('/', async (req, res) => {
         deadline: deadline ? new Date(deadline) : null,
         budget: parseFloat(budget) || 0,
         extraCost: parseFloat(extraCost) || 0,
-        prepayment: parseFloat(prepayment) || 0,
+        prepayment: prepaymentAmount,
         docLink,
         notes,
         stage: stage || 'design',
         members: members?.length
-          ? {
-              create: members.map(m => ({
-                employeeId: m.employeeId,
-                percent: parseFloat(m.percent),
-              })),
-            }
+          ? { create: members.map(m => ({ employeeId: m.employeeId, percent: parseFloat(m.percent) })) }
           : undefined,
       },
       include: { client: true, members: { include: { employee: true } } },
     });
 
+    if (prepaymentAmount > 0) {
+      await autoDistribute(project.id, project.name, prepaymentAmount);
+    }
+
     socket.emit('data:changed', { type: 'project' });
+    socket.emit('data:changed', { type: 'employee' });
     res.status(201).json(project);
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -95,6 +122,11 @@ router.put('/:id', async (req, res) => {
   try {
     const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, docLink, notes, stage, members } = req.body;
     const id = Number(req.params.id);
+    const newPrepayment = parseFloat(prepayment) || 0;
+
+    // Read old prepayment before update
+    const old = await prisma.project.findUnique({ where: { id }, select: { prepayment: true } });
+    const delta = newPrepayment - (old?.prepayment || 0);
 
     await prisma.projectEmployee.deleteMany({ where: { projectId: id } });
 
@@ -109,23 +141,23 @@ router.put('/:id', async (req, res) => {
         deadline: deadline ? new Date(deadline) : null,
         budget: parseFloat(budget) || 0,
         extraCost: parseFloat(extraCost) || 0,
-        prepayment: parseFloat(prepayment) || 0,
+        prepayment: newPrepayment,
         docLink,
         notes,
         stage: stage || 'design',
         members: members?.length
-          ? {
-              create: members.map(m => ({
-                employeeId: m.employeeId,
-                percent: parseFloat(m.percent),
-              })),
-            }
+          ? { create: members.map(m => ({ employeeId: m.employeeId, percent: parseFloat(m.percent) })) }
           : undefined,
       },
       include: { client: true, members: { include: { employee: true } } },
     });
 
+    if (delta > 0) {
+      await autoDistribute(project.id, project.name, delta);
+    }
+
     socket.emit('data:changed', { type: 'project' });
+    socket.emit('data:changed', { type: 'employee' });
     res.json(project);
   } catch (e) {
     res.status(500).json({ error: e.message });

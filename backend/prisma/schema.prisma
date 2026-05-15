@@ -58,6 +58,7 @@ model Employee {
 model SalaryPayment {
   id          Int      @id @default(autoincrement())
   employeeId  Int
+  projectId   Int?
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   amount      Float
   date        DateTime @default(now())

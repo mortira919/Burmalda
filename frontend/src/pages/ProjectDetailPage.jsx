@@ -146,22 +146,30 @@ export default function ProjectDetailPage() {
 
             {salary.breakdown.length > 0 ? (
               <div className="space-y-2">
-                {salary.breakdown.map((b, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#0F0F0F', border: '1px solid #212121' }}>
-                    <img
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(b.employee.name)}&backgroundColor=76B900&fontFamily=Ubuntu&fontSize=38`}
-                      alt={b.employee.name} className="w-9 h-9 rounded-lg shrink-0"
-                    />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-white">{b.employee.name}</p>
-                      <span className={`badge text-xs ${ROLE_COLOR[b.employee.role] || 'bg-gray-500/20 text-gray-400'}`}>{EMPLOYEE_ROLE[b.employee.role] || b.employee.role}</span>
+                {salary.breakdown.map((b, i) => {
+                  const paid = b.paid || 0;
+                  const owed = b.amount - paid;
+                  return (
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#0F0F0F', border: '1px solid #212121' }}>
+                      <img
+                        src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(b.employee.name)}&backgroundColor=76B900&fontFamily=Ubuntu&fontSize=38`}
+                        alt={b.employee.name} className="w-9 h-9 rounded-lg shrink-0"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-white">{b.employee.name}</p>
+                        <span className={`badge text-xs ${ROLE_COLOR[b.employee.role] || 'bg-gray-500/20 text-gray-400'}`}>{EMPLOYEE_ROLE[b.employee.role] || b.employee.role}</span>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono font-bold text-primary-400">{formatMoney(b.amount)}</p>
+                        <p className="text-xs font-mono">
+                          <span className="text-green-400">{formatMoney(paid)} выплачено</span>
+                          {owed > 0.01 && <span className="text-orange-400 ml-1">· {formatMoney(owed)} ещё</span>}
+                        </p>
+                        <p className="text-xs text-gray-600 font-mono">{b.percent}%</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-mono font-bold text-primary-400">{formatMoney(b.amount)}</p>
-                      <p className="text-xs text-gray-600 font-mono">{b.percent}%</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-gray-600 text-sm text-center py-4">Добавьте сотрудников в карточке проекта</p>

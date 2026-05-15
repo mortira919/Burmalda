@@ -123,10 +123,20 @@ router.get('/salary/:projectId', async (req, res) => {
     const tax = (total * taxRate) / 100;
     const distributable = total - tax;
 
+    const salaryPayments = await prisma.salaryPayment.findMany({
+      where: { projectId: Number(req.params.projectId) },
+    });
+
+    const paidByEmployee = {};
+    for (const p of salaryPayments) {
+      paidByEmployee[p.employeeId] = (paidByEmployee[p.employeeId] || 0) + p.amount;
+    }
+
     const breakdown = project.members.map(m => ({
       employee: m.employee,
       percent: m.percent,
       amount: (distributable * m.percent) / 100,
+      paid: paidByEmployee[m.employeeId] || 0,
     }));
 
     const totalDistributed = breakdown.reduce((s, b) => s + b.amount, 0);
