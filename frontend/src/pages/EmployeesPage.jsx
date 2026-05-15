@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { employeesApi } from '../api/client';
+import { employeesApi, projectsApi } from '../api/client';
 import { formatDate, formatMoney, EMPLOYEE_ROLE, ROLE_COLOR, PROJECT_STATUS } from '../utils/helpers';
 import Modal from '../components/Modal';
 import { UserCheck, Plus, Pencil, Trash2, ChevronDown, ChevronRight, Banknote } from 'lucide-react';
@@ -36,17 +36,51 @@ function EmployeeForm({ initial, onSave, onCancel }) {
   );
 }
 
-function PaymentForm({ employee, onSave, onCancel }) {
-  const [form, setForm] = useState({ amount: '', date: new Date().toISOString().split('T')[0], notes: '' });
+function PaymentForm({ employee, projects, initialProjectId, initialAmount, onSave, onCancel }) {
+  const empProjects = employee.projectMembers?.map(m => m.project).filter(Boolean) || [];
+  const [form, setForm] = useState({
+    amount: initialAmount || '',
+    date: new Date().toISOString().split('T')[0],
+    notes: '',
+    projectId: initialProjectId || '',
+  });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const selectedProject = empProjects.find(p => p.id === Number(form.projectId));
+  const paidForProject = selectedProject
+    ? (employee.salaryPayments?.filter(p => p.projectId === selectedProject.id).reduce((s, p) => s + p.amount, 0) || 0)
+    : null;
+  const owedForProject = selectedProject
+    ? Math.max(0, ((selectedProject.budget || 0) + (selectedProject.extraCost || 0)) * (employee.projectMembers?.find(m => m.project?.id === selectedProject.id)?.percent || 0) / 100 - paidForProject)
+    : null;
+
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true);
-    try { await onSave({ ...form, employeeId: employee.id }); } catch { setSaving(false); }
+    try { await onSave({ ...form, employeeId: employee.id, projectId: form.projectId || undefined }); } catch { setSaving(false); }
   };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <p className="text-sm text-gray-400">Сотрудник: <span className="text-white font-medium">{employee.name}</span></p>
+      <div>
+        <label className="label">Проект</label>
+        <select className="input" value={form.projectId} onChange={e => set('projectId', e.target.value)}>
+          <option value="">Без проекта (бонус / аванс)</option>
+          {empProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        {owedForProject !== null && owedForProject > 0.01 && (
+          <p className="text-xs text-orange-400 mt-1 flex items-center gap-1">
+            Долг по проекту: <span className="font-mono font-semibold">{formatMoney(owedForProject)}</span>
+            <button type="button" className="text-primary-400 underline ml-1" onClick={() => set('amount', String(Math.round(owedForProject)))}>
+              вставить
+            </button>
+          </p>
+        )}
+        {owedForProject !== null && owedForProject <= 0.01 && (
+          <p className="text-xs text-green-400 mt-1">По этому проекту всё выплачено ✓</p>
+        )}
+      </div>
       <div><label className="label">Сумма (₸) *</label><MoneyInput required value={form.amount} onChange={v => set('amount', v)} placeholder="50 000" /></div>
       <div><label className="label">Дата</label><input type="date" className="input" value={form.date} onChange={e => set('date', e.target.value)} /></div>
       <div><label className="label">Заметка</label><input className="input" value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="За май, бонус..." /></div>
@@ -60,12 +94,16 @@ function PaymentForm({ employee, onSave, onCancel }) {
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState(null);
   const [expanded, setExpanded] = useState(null);
   const [tick, setTick] = useState(0);
 
-  const load = () => employeesApi.getAll().then(r => setEmployees(r.data)).finally(() => setLoading(false));
+  const load = () => Promise.all([
+    employeesApi.getAll(),
+    projectsApi.getAll(),
+  ]).then(([e, p]) => { setEmployees(e.data); setProjects(p.data); }).finally(() => setLoading(false));
   useEffect(() => { load(); }, [tick]);
   useSync(useCallback(() => setTick(t => t + 1), []));
 
@@ -160,10 +198,19 @@ export default function EmployeesPage() {
                                 </div>
                                 <span className="text-gray-600 font-mono text-xs">{m.percent}%</span>
                               </div>
-                              <div className="flex gap-3 mt-1.5 font-mono text-xs">
+                              <div className="flex gap-3 mt-1.5 font-mono text-xs flex-wrap">
                                 <span className="text-gray-600">Начислено: <span className="text-yellow-400">{formatMoney(accrued)}</span></span>
                                 <span className="text-gray-600">Выплачено: <span className="text-green-400">{formatMoney(paidForProject)}</span></span>
-                                {owedForProject > 0.01 && <span className="text-gray-600">Ещё: <span className="text-orange-400">{formatMoney(owedForProject)}</span></span>}
+                                {owedForProject > 0.01 && (
+                                  <>
+                                    <span className="text-gray-600">Ещё: <span className="text-orange-400">{formatMoney(owedForProject)}</span></span>
+                                    <button
+                                      onClick={() => setModal({ type: 'pay', employee: emp, initialProjectId: m.project?.id, initialAmount: String(Math.round(owedForProject)) })}
+                                      className="text-primary-400 hover:text-primary-300 font-sans">
+                                      Выплатить →
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </div>
                           );
@@ -222,7 +269,7 @@ export default function EmployeesPage() {
         {modal?.type === 'edit' && <EmployeeForm initial={modal.form} onSave={handleEdit} onCancel={() => setModal(null)} />}
       </Modal>
       <Modal open={modal?.type === 'pay'} onClose={() => setModal(null)} title="Выплатить зарплату">
-        {modal?.type === 'pay' && <PaymentForm employee={modal.employee} onSave={handlePay} onCancel={() => setModal(null)} />}
+        {modal?.type === 'pay' && <PaymentForm employee={modal.employee} projects={projects} initialProjectId={modal.initialProjectId} initialAmount={modal.initialAmount} onSave={handlePay} onCancel={() => setModal(null)} />}
       </Modal>
     </div>
   );

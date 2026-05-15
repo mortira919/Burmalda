@@ -180,12 +180,18 @@ export default function ProjectDetailPage() {
                 <span className="badge bg-white/5 text-gray-500 border border-white/10 font-mono">{project.payments.length}</span>
               )}
             </h2>
-            <button onClick={() => setAddingPayment(true)} className="text-xs text-primary-500 hover:text-primary-400 flex items-center gap-1">
-              <Plus size={12} /> Добавить этап
-            </button>
+            {project.status !== 'completed' && (
+              <button onClick={() => setAddingPayment(true)} className="text-xs text-primary-500 hover:text-primary-400 flex items-center gap-1">
+                <Plus size={12} /> Добавить этап
+              </button>
+            )}
           </div>
 
-          {project.payments?.length === 0 && !addingPayment && (
+          {project.status === 'completed' && (
+            <p className="text-xs text-green-600 py-1">Проект завершён — этапы заблокированы</p>
+          )}
+
+          {project.payments?.length === 0 && !addingPayment && project.status !== 'completed' && (
             <p className="text-xs text-gray-700 py-2">Нет этапов — нажмите «Добавить этап» чтобы создать план оплаты</p>
           )}
 
@@ -206,16 +212,20 @@ export default function ProjectDetailPage() {
                 <span className={`badge shrink-0 ${p.status === 'paid' ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'}`}>
                   {p.status === 'paid' ? 'Получено' : 'Ожидает'}
                 </span>
-                <button
-                  onClick={() => handleTogglePayment(p.id, p.status)}
-                  className={`shrink-0 py-1 px-2 rounded-lg text-xs font-medium transition-colors border ${p.status === 'paid' ? 'text-gray-500 border-white/10 hover:text-orange-400 hover:border-orange-500/30' : 'text-primary-400 border-primary-500/30 hover:bg-primary-600/10'}`}
-                  style={{ background: '#0F0F0F' }}
-                  title={p.status === 'paid' ? 'Отменить получение' : 'Отметить как полученный'}>
-                  {p.status === 'paid' ? <RotateCcw size={13} /> : '✓ Получили'}
-                </button>
-                <button onClick={() => handleDeletePayment(p.id)} className="text-gray-700 hover:text-red-400 transition-colors shrink-0">
-                  <Trash2 size={13} />
-                </button>
+                {project.status !== 'completed' && (
+                  <>
+                    <button
+                      onClick={() => handleTogglePayment(p.id, p.status)}
+                      className={`shrink-0 py-1 px-2 rounded-lg text-xs font-medium transition-colors border ${p.status === 'paid' ? 'text-gray-500 border-white/10 hover:text-orange-400 hover:border-orange-500/30' : 'text-primary-400 border-primary-500/30 hover:bg-primary-600/10'}`}
+                      style={{ background: '#0F0F0F' }}
+                      title={p.status === 'paid' ? 'Отменить получение' : 'Отметить как полученный'}>
+                      {p.status === 'paid' ? <RotateCcw size={13} /> : '✓ Получили'}
+                    </button>
+                    <button onClick={() => handleDeletePayment(p.id)} className="text-gray-700 hover:text-red-400 transition-colors shrink-0">
+                      <Trash2 size={13} />
+                    </button>
+                  </>
+                )}
               </div>
             ))}
           </div>

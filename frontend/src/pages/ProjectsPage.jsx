@@ -43,20 +43,20 @@ function QuickSelect({ value, options, colorMap, onSelect }) {
   );
 }
 
-function StageProgress({ stage }) {
+function StageProgress({ stage, completed }) {
   const stages = ['design', 'frontend', 'fullstack'];
   const labels = ['Дизайн', 'UI', 'Бэкенд'];
-  const current = stages.indexOf(stage);
+  const current = completed ? 3 : stages.indexOf(stage);
   return (
     <div className="flex items-center gap-1">
       {stages.map((s, i) => (
         <React.Fragment key={s}>
           <div className={`text-xs px-2 py-0.5 rounded-full font-medium transition-all ${
-            i < current  ? 'bg-green-500/20 text-green-400' :
+            completed || i < current  ? 'bg-green-500/20 text-green-400' :
             i === current ? 'bg-primary-600/30 text-primary-400 ring-1 ring-primary-500/50' :
             'bg-white/5 text-gray-600'
           }`}>{i + 1} {labels[i]}</div>
-          {i < 2 && <div className={`w-3 h-px ${i < current ? 'bg-green-500/50' : 'bg-white/10'}`} />}
+          {i < 2 && <div className={`w-3 h-px ${completed || i < current ? 'bg-green-500/50' : 'bg-white/10'}`} />}
         </React.Fragment>
       ))}
     </div>
@@ -308,9 +308,11 @@ export default function ProjectsPage() {
                       )}
 
                       <div className="flex items-center gap-3 mt-2 flex-wrap">
-                        <StageProgress stage={p.stage || 'design'} />
-                        <QuickSelect value={p.stage || 'design'} options={PROJECT_STAGE} colorMap={PROJECT_STAGE}
-                          onSelect={v => handleQuickPatch(p.id, { stage: v })} />
+                        <StageProgress stage={p.stage || 'design'} completed={p.status === 'completed'} />
+                        {p.status !== 'completed' && (
+                          <QuickSelect value={p.stage || 'design'} options={PROJECT_STAGE} colorMap={PROJECT_STAGE}
+                            onSelect={v => handleQuickPatch(p.id, { stage: v })} />
+                        )}
                       </div>
 
                       {p.members?.length > 0 && (
