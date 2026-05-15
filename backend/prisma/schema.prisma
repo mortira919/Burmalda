@@ -131,6 +131,19 @@ model Expense {
   createdAt   DateTime @default(now())
 }
 
+model TaxRecord {
+  id        Int       @id @default(autoincrement())
+  period    String    // "2026-H1" | "2026-H2"
+  label     String    // "Январь–Июнь 2026"
+  amount    Float     // начислено
+  paid      Float     @default(0) // оплачено
+  status    String    @default("pending") // pending | paid
+  dueDate   DateTime
+  paidAt    DateTime?
+  notes     String?
+  createdAt DateTime  @default(now())
+}
+
 model Settings {
   id       Int   @id @default(autoincrement())
   key      String @unique

@@ -156,4 +156,100 @@ router.get('/salary/:projectId', async (req, res) => {
   }
 });
 
+// ── Tax records ──────────────────────────────────────────────
+
+router.get('/taxes', async (req, res) => {
+  try {
+    const taxes = await prisma.taxRecord.findMany({ orderBy: { dueDate: 'desc' } });
+    res.json(taxes);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Auto-calculate and create tax record for a period
+router.post('/taxes/generate', async (req, res) => {
+  try {
+    const { year, half } = req.body; // half: 1 | 2
+    const y = parseInt(year);
+    const h = parseInt(half);
+
+    const from = new Date(y, h === 1 ? 0 : 6, 1);          // Jan 1 or Jul 1
+    const to   = new Date(y, h === 1 ? 6 : 12, 0, 23, 59, 59); // Jun 30 or Dec 31
+    const dueDate = h === 1 ? new Date(y, 7, 25) : new Date(y + 1, 1, 25); // Aug 25 or Feb 25
+
+    const period = `${y}-H${h}`;
+    const label  = h === 1 ? `Январь–Июнь ${y}` : `Июль–Декабрь ${y}`;
+
+    const existing = await prisma.taxRecord.findFirst({ where: { period } });
+    if (existing) return res.status(400).json({ error: `Запись за ${label} уже существует` });
+
+    const taxSetting = await prisma.settings.findUnique({ where: { key: 'tax_rate' } });
+    const taxRate = taxSetting ? parseFloat(taxSetting.value) : 0;
+
+    const [txIncome, prepayData] = await Promise.all([
+      prisma.transaction.aggregate({
+        where: { type: 'income', date: { gte: from, lte: to } },
+        _sum: { amount: true },
+      }),
+      prisma.project.aggregate({
+        where: { createdAt: { gte: from, lte: to } },
+        _sum: { prepayment: true },
+      }),
+    ]);
+
+    const totalIncome = (txIncome._sum.amount || 0) + (prepayData._sum.prepayment || 0);
+    const amount = (totalIncome * taxRate) / 100;
+
+    const record = await prisma.taxRecord.create({
+      data: { period, label, amount, dueDate, status: 'pending' },
+    });
+    socket.emit('data:changed', { type: 'finance' });
+    res.status(201).json(record);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Create manual tax record
+router.post('/taxes', async (req, res) => {
+  try {
+    const { period, label, amount, dueDate, notes } = req.body;
+    const record = await prisma.taxRecord.create({
+      data: { period, label, amount: parseFloat(amount), dueDate: new Date(dueDate), notes },
+    });
+    socket.emit('data:changed', { type: 'finance' });
+    res.status(201).json(record);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Mark as paid / update
+router.patch('/taxes/:id', async (req, res) => {
+  try {
+    const { status, paid, paidAt, notes } = req.body;
+    const data = {};
+    if (status !== undefined) data.status = status;
+    if (paid  !== undefined) data.paid   = parseFloat(paid);
+    if (paidAt !== undefined) data.paidAt = paidAt ? new Date(paidAt) : null;
+    if (notes !== undefined) data.notes  = notes;
+    const record = await prisma.taxRecord.update({ where: { id: Number(req.params.id) }, data });
+    socket.emit('data:changed', { type: 'finance' });
+    res.json(record);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.delete('/taxes/:id', async (req, res) => {
+  try {
+    await prisma.taxRecord.delete({ where: { id: Number(req.params.id) } });
+    socket.emit('data:changed', { type: 'finance' });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;

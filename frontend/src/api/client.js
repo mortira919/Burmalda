@@ -70,6 +70,11 @@ export const financeApi = {
   createExpense: (data) => api.post('/finance/expenses', data),
   deleteExpense: (id) => api.delete(`/finance/expenses/${id}`),
   getSalary: (projectId) => api.get(`/finance/salary/${projectId}`),
+  getTaxes: () => api.get('/finance/taxes'),
+  generateTax: (data) => api.post('/finance/taxes/generate', data),
+  createTax: (data) => api.post('/finance/taxes', data),
+  patchTax: (id, data) => api.patch(`/finance/taxes/${id}`, data),
+  deleteTax: (id) => api.delete(`/finance/taxes/${id}`),
 };
 
 export const analyticsApi = {
