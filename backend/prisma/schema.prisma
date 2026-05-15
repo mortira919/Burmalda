@@ -37,6 +37,8 @@ model Lead {
   status          String   @default("thinking") // thinking | needs_tz | waiting_prepay | rejected | converted
   tzAuthor        String?  // client | studio
   prepayment      Float?
+  source          String?  // ads | olx | manager | referral
+  sourceDetail    String?  // manager name or referrer name
   notes           String?
   lastContactDate DateTime?
   followUpDate    DateTime?

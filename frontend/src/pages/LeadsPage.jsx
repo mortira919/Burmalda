@@ -6,7 +6,9 @@ import { Target, Plus, Pencil, Trash2, ArrowRightCircle, LayoutList, Columns3 } 
 import { useSync } from '../hooks/useSync';
 import { PhoneInput } from '../components/FormInputs';
 
-const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', tzAuthor: '', prepayment: '', notes: '', lastContactDate: '', followUpDate: '' };
+const emptyForm = { name: '', phone: '', email: '', company: '', status: 'thinking', tzAuthor: '', prepayment: '', source: '', sourceDetail: '', notes: '', lastContactDate: '', followUpDate: '' };
+
+const SOURCE_LABELS = { ads: '📣 Реклама', olx: '🛒 OLX', manager: '👤 Нашёл менеджер', referral: '🗣 Сарафанное радио' };
 
 const toDateInput = (d) => d.toISOString().split('T')[0];
 
@@ -61,6 +63,29 @@ function LeadForm({ initial, onSave, onCancel }) {
         </div>
       </div>
       <div>
+        <label className="label">Откуда пришёл</label>
+        <div className="flex gap-2">
+          <select className="input flex-1" value={form.source} onChange={e => set('source', e.target.value)}>
+            <option value="">— не выбрано —</option>
+            <option value="ads">📣 Реклама</option>
+            <option value="olx">🛒 OLX</option>
+            <option value="manager">👤 Нашёл менеджер</option>
+            <option value="referral">🗣 Сарафанное радио</option>
+          </select>
+          {form.source === 'manager' && (
+            <select className="input w-36" value={form.sourceDetail} onChange={e => set('sourceDetail', e.target.value)}>
+              <option value="">— кто —</option>
+              <option value="Артур">Артур</option>
+              <option value="Дмитрий">Дмитрий</option>
+              <option value="Радион">Радион</option>
+            </select>
+          )}
+          {form.source === 'referral' && (
+            <input className="input w-40" placeholder="Имя заказчика" value={form.sourceDetail} onChange={e => set('sourceDetail', e.target.value)} />
+          )}
+        </div>
+      </div>
+      <div>
         <label className="label">Когда связаться</label>
         <div className="flex gap-1.5">
           <input type="date" className="input flex-1" value={form.followUpDate} onChange={e => set('followUpDate', e.target.value)} />
@@ -93,6 +118,7 @@ function LeadCard({ lead, onEdit, onDelete, onConvert }) {
         return <p className={`text-xs mt-0.5 font-medium ${overdue ? 'text-red-400' : 'text-yellow-500'}`}>📅 {overdue ? 'Просрочено: ' : 'Связаться: '}{formatDate(lead.followUpDate)}</p>;
       })()}
       <div className="flex flex-wrap gap-1.5 mt-1.5">
+        {lead.source && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">{SOURCE_LABELS[lead.source]}{lead.sourceDetail ? `: ${lead.sourceDetail}` : ''}</span>}
         {lead.tzAuthor && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">📋 ТЗ: {lead.tzAuthor === 'studio' ? 'Мы' : 'Заказчик'}</span>}
         {lead.prepayment > 0 && <span className="badge bg-white/5 text-gray-500 border border-white/10 text-xs">💰 {lead.prepayment.toLocaleString('ru')} ₸</span>}
       </div>
