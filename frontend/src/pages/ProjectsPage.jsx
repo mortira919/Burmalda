@@ -9,7 +9,7 @@ import { MoneyInput } from '../components/FormInputs';
 
 const emptyForm = {
   name: '', clientId: '', status: 'development', priority: 'medium',
-  startDate: '', deadline: '', budget: '', extraCost: '', prepayment: '', docLink: '', notes: '', stage: 'design', members: [],
+  startDate: '', deadline: '', budget: '', extraCost: '', prepayment: '', marketingCost: '', docLink: '', notes: '', stage: 'design', members: [],
 };
 
 
@@ -128,10 +128,15 @@ function ProjectForm({ initial, clients, employees, onSave, onCancel }) {
           <label className="label">Предоплата (₸)</label>
           <MoneyInput value={form.prepayment} onChange={v => set('prepayment', v)} placeholder="500 000" />
         </div>
-        <div className="md:col-span-2">
+        <div>
           <label className="label">Доп. работы (₸)</label>
           <MoneyInput value={form.extraCost} onChange={v => set('extraCost', v)} placeholder="0" />
-          <p className="text-xs text-gray-600 mt-1">Дополнительные работы сверх основного бюджета — суммируются при расчёте зарплат</p>
+          <p className="text-xs text-gray-600 mt-1">Сверх бюджета — суммируются при расчёте зарплат</p>
+        </div>
+        <div>
+          <label className="label">Затраты на привлечение (₸)</label>
+          <MoneyInput value={form.marketingCost} onChange={v => set('marketingCost', v)} placeholder="0" />
+          <p className="text-xs text-gray-600 mt-1">Реклама, OLX, другие каналы — для расчёта ROMI</p>
         </div>
         <div className="md:col-span-2">
           <label className="label">Этап разработки</label>
@@ -333,6 +338,7 @@ export default function ProjectsPage() {
                           deadline: p.deadline ? p.deadline.split('T')[0] : '',
                           stage: p.stage || 'design',
                           extraCost: p.extraCost || '',
+                          marketingCost: p.marketingCost || '',
                           members: p.members?.map(m => ({ employeeId: m.employeeId, percent: m.percent })) || [],
                         }})}
                         className="btn-secondary py-1 px-2.5"><Pencil size={13} /></button>

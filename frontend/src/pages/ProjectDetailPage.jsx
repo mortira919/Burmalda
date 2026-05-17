@@ -68,6 +68,8 @@ export default function ProjectDetailPage() {
 
   const total = project.budget + (project.extraCost || 0);
   const balance = total - project.prepayment;
+  const marketingCost = project.marketingCost || 0;
+  const romi = marketingCost > 0 ? ((project.prepayment - marketingCost) / marketingCost * 100) : null;
   const paidPayments   = project.payments?.filter(p => p.status === 'paid') || [];
   const pendingPayments = project.payments?.filter(p => p.status === 'pending') || [];
   const paymentsTotal  = project.payments?.reduce((s, p) => s + p.amount, 0) || 0;
@@ -155,6 +157,20 @@ export default function ProjectDetailPage() {
               <span className="text-gray-300 font-medium">Остаток к оплате</span>
               <span className={`font-mono font-semibold ${balance > 0 ? 'text-orange-400' : 'text-green-400'}`}>{formatMoney(balance)}</span>
             </div>
+            {marketingCost > 0 && (
+              <div className="pt-2 space-y-2" style={{ borderTop: '1px solid #212121' }}>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Затраты на привлечение</span>
+                  <span className="text-red-400 font-mono">−{formatMoney(marketingCost)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 font-medium">ROMI</span>
+                  <span className={`font-mono font-bold text-base ${romi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {romi !== null ? `${romi >= 0 ? '+' : ''}${romi.toFixed(0)}%` : '—'}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
           {total > 0 && (
             <div>

@@ -95,6 +95,7 @@ model Project {
   budget        Float             @default(0)
   extraCost     Float             @default(0)
   prepayment    Float             @default(0)
+  marketingCost Float             @default(0)
   docLink       String?
   notes         String?
   stage         String            @default("design")

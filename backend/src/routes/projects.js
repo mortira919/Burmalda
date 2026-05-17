@@ -79,7 +79,7 @@ router.patch('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, docLink, notes, stage, members } = req.body;
+    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, marketingCost, docLink, notes, stage, members } = req.body;
     const prepaymentAmount = parseFloat(prepayment) || 0;
     const project = await prisma.project.create({
       data: {
@@ -92,6 +92,7 @@ router.post('/', async (req, res) => {
         budget: parseFloat(budget) || 0,
         extraCost: parseFloat(extraCost) || 0,
         prepayment: prepaymentAmount,
+        marketingCost: parseFloat(marketingCost) || 0,
         docLink, notes,
         stage: stage || 'design',
         members: members?.length
@@ -113,7 +114,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, docLink, notes, stage, members } = req.body;
+    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, marketingCost, docLink, notes, stage, members } = req.body;
     const id = Number(req.params.id);
     const newPrepayment = parseFloat(prepayment) || 0;
     const old = await prisma.project.findUnique({ where: { id }, select: { prepayment: true, name: true } });
@@ -130,6 +131,7 @@ router.put('/:id', async (req, res) => {
         budget: parseFloat(budget) || 0,
         extraCost: parseFloat(extraCost) || 0,
         prepayment: newPrepayment,
+        marketingCost: parseFloat(marketingCost) || 0,
         docLink, notes,
         stage: stage || 'design',
         members: members?.length
