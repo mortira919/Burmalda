@@ -11,9 +11,9 @@ const emptyForm = {
   name: '', clientId: '', status: 'development', priority: 'medium',
   startDate: '', deadline: '', budget: '', extraCost: '', prepayment: '', marketingCost: '', docLink: '', notes: '', stage: 'design', members: [],
   paymentStages: [
-    { description: 'Предоплата', amount: '' },
-    { description: 'После дизайна', amount: '' },
-    { description: 'Финальный расчёт', amount: '' },
+    { description: 'Дизайн в Figma', amount: '' },
+    { description: 'Готовый UI (APK)', amount: '' },
+    { description: 'Полноценное приложение с бекендом', amount: '' },
   ],
 };
 
@@ -375,7 +375,7 @@ export default function ProjectsPage() {
                           members: p.members?.map(m => ({ employeeId: m.employeeId, percent: m.percent })) || [],
                           paymentStages: p.payments?.length
                             ? p.payments.map(pay => ({ description: pay.description || '', amount: pay.amount || '' }))
-                            : [{ description: 'Предоплата', amount: '' }, { description: 'После дизайна', amount: '' }, { description: 'Финальный расчёт', amount: '' }],
+                            : [{ description: 'Дизайн в Figma', amount: '' }, { description: 'Готовый UI (APK)', amount: '' }, { description: 'Полноценное приложение с бекендом', amount: '' }],
                         }})}
                         className="btn-secondary py-1 px-2.5"><Pencil size={13} /></button>
                       <button onClick={() => handleDelete(p.id)} className="btn-danger py-1 px-2.5"><Trash2 size={13} /></button>
