@@ -10,6 +10,11 @@ import { MoneyInput } from '../components/FormInputs';
 const emptyForm = {
   name: '', clientId: '', status: 'development', priority: 'medium',
   startDate: '', deadline: '', budget: '', extraCost: '', prepayment: '', marketingCost: '', docLink: '', notes: '', stage: 'design', members: [],
+  paymentStages: [
+    { description: 'Предоплата', amount: '' },
+    { description: 'После дизайна', amount: '' },
+    { description: 'Финальный расчёт', amount: '' },
+  ],
 };
 
 
@@ -191,6 +196,34 @@ function ProjectForm({ initial, clients, employees, onSave, onCancel }) {
         </div>
       </div>
 
+      {/* Payment stages */}
+      <div>
+        <label className="label">График платежей (необязательно)</label>
+        <div className="space-y-2">
+          {form.paymentStages.map((s, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <span className="text-xs text-gray-600 w-14 shrink-0">Этап {i + 1}</span>
+              <input className="input flex-1 text-sm" placeholder={s.description}
+                value={s.description}
+                onChange={e => {
+                  const stages = [...form.paymentStages];
+                  stages[i] = { ...stages[i], description: e.target.value };
+                  set('paymentStages', stages);
+                }} />
+              <div className="w-36">
+                <MoneyInput value={s.amount} placeholder="0"
+                  onChange={v => {
+                    const stages = [...form.paymentStages];
+                    stages[i] = { ...stages[i], amount: v };
+                    set('paymentStages', stages);
+                  }} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-700 mt-1.5">Заполни суммы — этапы появятся в карточке проекта</p>
+      </div>
+
       {error && (
         <div className="p-3 rounded-xl text-sm text-red-400" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
           {error}
@@ -340,6 +373,9 @@ export default function ProjectsPage() {
                           extraCost: p.extraCost || '',
                           marketingCost: p.marketingCost || '',
                           members: p.members?.map(m => ({ employeeId: m.employeeId, percent: m.percent })) || [],
+                          paymentStages: p.payments?.length
+                            ? p.payments.map(pay => ({ description: pay.description || '', amount: pay.amount || '' }))
+                            : [{ description: 'Предоплата', amount: '' }, { description: 'После дизайна', amount: '' }, { description: 'Финальный расчёт', amount: '' }],
                         }})}
                         className="btn-secondary py-1 px-2.5"><Pencil size={13} /></button>
                       <button onClick={() => handleDelete(p.id)} className="btn-danger py-1 px-2.5"><Trash2 size={13} /></button>

@@ -79,7 +79,7 @@ router.patch('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, marketingCost, docLink, notes, stage, members } = req.body;
+    const { name, clientId, status, priority, startDate, deadline, budget, extraCost, prepayment, marketingCost, docLink, notes, stage, members, paymentStages } = req.body;
     const prepaymentAmount = parseFloat(prepayment) || 0;
     const project = await prisma.project.create({
       data: {
@@ -103,6 +103,18 @@ router.post('/', async (req, res) => {
     });
     if (prepaymentAmount > 0) {
       await autoDistribute(project.id, project.name, prepaymentAmount);
+    }
+    // Create payment stage records for filled stages
+    const filledStages = (paymentStages || []).filter(s => parseFloat(s.amount) > 0);
+    if (filledStages.length > 0) {
+      await prisma.projectPayment.createMany({
+        data: filledStages.map(s => ({
+          projectId: project.id,
+          amount: parseFloat(s.amount),
+          description: s.description || null,
+          status: 'pending',
+        })),
+      });
     }
     socket.emit('data:changed', { type: 'project' });
     socket.emit('data:changed', { type: 'employee' });
