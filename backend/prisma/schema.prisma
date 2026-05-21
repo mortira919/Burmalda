@@ -155,3 +155,13 @@ model Settings {
   key      String @unique
   value    String
 }
+
+model Recording {
+  id        Int      @id @default(autoincrement())
+  clientId  Int?
+  leadId    Int?
+  filename  String
+  duration  Int?
+  notes     String?
+  createdAt DateTime @default(now())
+}

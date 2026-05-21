@@ -12,6 +12,7 @@ const employeeRoutes = require('./routes/employees');
 const financeRoutes = require('./routes/finance');
 const analyticsRoutes = require('./routes/analytics');
 const settingsRoutes = require('./routes/settings');
+const recordingRoutes = require('./routes/recordings');
 
 const app = express();
 const server = http.createServer(app);
@@ -30,6 +31,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/recordings', recordingRoutes);
 
 server.listen(PORT, () => {
   console.log(`CRM Server running on http://localhost:${PORT}`);

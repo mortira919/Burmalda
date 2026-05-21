@@ -12,6 +12,7 @@ import EmployeesPage from './pages/EmployeesPage';
 import FinancePage from './pages/FinancePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SettingsPage from './pages/SettingsPage';
+import RecordingsPage from './pages/RecordingsPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="finance" element={<FinancePage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="recordings" element={<RecordingsPage />} />
       </Route>
     </Routes>
   );

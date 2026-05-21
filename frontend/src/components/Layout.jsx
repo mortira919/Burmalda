@@ -3,18 +3,19 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, FolderKanban, Users2, Target,
-  UserCheck, Wallet, BarChart3, Settings2, LogOut, Menu, X,
+  UserCheck, Wallet, BarChart3, Settings2, LogOut, Menu, X, Mic,
 } from 'lucide-react';
 
 const navItems = [
-  { to: '/',           label: 'Дашборд',    icon: LayoutDashboard, end: true },
-  { to: '/projects',   label: 'Проекты',    icon: FolderKanban },
-  { to: '/clients',    label: 'Клиенты',    icon: Users2 },
-  { to: '/leads',      label: 'Лиды',       icon: Target },
-  { to: '/employees',  label: 'Сотрудники', icon: UserCheck },
-  { to: '/finance',    label: 'Финансы',    icon: Wallet },
-  { to: '/analytics',  label: 'Аналитика',  icon: BarChart3 },
-  { to: '/settings',   label: 'Настройки',  icon: Settings2 },
+  { to: '/',            label: 'Дашборд',    icon: LayoutDashboard, end: true },
+  { to: '/projects',    label: 'Проекты',    icon: FolderKanban },
+  { to: '/clients',     label: 'Клиенты',    icon: Users2 },
+  { to: '/leads',       label: 'Лиды',       icon: Target },
+  { to: '/employees',   label: 'Сотрудники', icon: UserCheck },
+  { to: '/finance',     label: 'Финансы',    icon: Wallet },
+  { to: '/analytics',   label: 'Аналитика',  icon: BarChart3 },
+  { to: '/recordings',  label: 'Звонки',     icon: Mic },
+  { to: '/settings',    label: 'Настройки',  icon: Settings2 },
 ];
 
 function Avatar({ name, size = 8, className = '' }) {

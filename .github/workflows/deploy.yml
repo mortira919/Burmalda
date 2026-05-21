@@ -23,6 +23,7 @@ jobs:
 
             echo "=== Backend ==="
             cd backend
+            mkdir -p uploads/recordings
             npm install --production
             npx prisma generate
             npx prisma db push

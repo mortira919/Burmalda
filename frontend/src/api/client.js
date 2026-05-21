@@ -87,4 +87,12 @@ export const settingsApi = {
   update: (data) => api.put('/settings', data),
 };
 
+export const recordingsApi = {
+  getAll: () => api.get('/recordings'),
+  upload: (formData) => api.post('/recordings/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  patch: (id, data) => api.patch(`/recordings/${id}`, data),
+  delete: (id) => api.delete(`/recordings/${id}`),
+  fileUrl: (filename) => `/api/recordings/file/${filename}`,
+};
+
 export default api;
