@@ -157,11 +157,13 @@ model Settings {
 }
 
 model Recording {
-  id        Int      @id @default(autoincrement())
-  clientId  Int?
-  leadId    Int?
-  filename  String
-  duration  Int?
-  notes     String?
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  clientId   Int?
+  leadId     Int?
+  filename   String
+  duration   Int?
+  notes      String?
+  transcript String?
+  analysis   String?  // JSON: { name, phone, essence, type, budget, deadline, requirements, notes }
+  createdAt  DateTime @default(now())
 }
