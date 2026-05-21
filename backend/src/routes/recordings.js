@@ -69,10 +69,11 @@ router.get('/file/:filename', (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   try {
-    const { notes, clientId, leadId, transcript } = req.body;
+    const { notes, clientId, leadId, transcript, analysis } = req.body;
     const data = {};
     if (notes !== undefined) data.notes = notes;
     if (transcript !== undefined) data.transcript = transcript;
+    if (analysis !== undefined) data.analysis = analysis;
     if (clientId !== undefined) data.clientId = clientId ? parseInt(clientId) : null;
     if (leadId !== undefined) data.leadId = leadId ? parseInt(leadId) : null;
     const rec = await prisma.recording.update({ where: { id: parseInt(req.params.id) }, data });

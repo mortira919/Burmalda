@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { recordingsApi, clientsApi, leadsApi } from '../api/client';
 import { formatDate } from '../utils/helpers';
-import { Mic, Trash2, Play, Pause, User, Target, Pencil, Check, X, Sparkles, Upload, ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import { Mic, Trash2, Play, Pause, User, Target, Sparkles, Upload, ChevronDown, ChevronUp, Plus, Copy, ExternalLink, Download } from 'lucide-react';
 import VoiceRecorder from '../components/VoiceRecorder';
-import Modal from '../components/Modal';
 import { useSync } from '../hooks/useSync';
 import { useNavigate } from 'react-router-dom';
 
@@ -44,25 +43,63 @@ function AudioPlayer({ url }) {
   );
 }
 
-function AnalysisPanel({ rec, clients, leads, onRefresh }) {
-  const [open, setOpen] = useState(false);
-  const [transcript, setTranscript] = useState(rec.transcript || '');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(rec.analysis ? JSON.parse(rec.analysis) : null);
+const AI_STUDIO_PROMPT = `Ты — ассистент менеджера IT-студии. Прослушай аудиозапись разговора с потенциальным клиентом и верни ТОЛЬКО валидный JSON без markdown, без пояснений:
+
+{
+  "name": "имя или название компании клиента",
+  "phone": "номер телефона если упоминался",
+  "projectEssence": "суть проекта в 1-2 предложениях",
+  "projectType": "сайт / мобильное приложение / веб-приложение / дизайн / другое",
+  "techStack": "технологии если упоминались",
+  "budget": "бюджет если упоминался",
+  "deadline": "сроки если упоминались",
+  "requirements": ["требование 1", "требование 2"],
+  "openQuestions": ["что нужно уточнить у клиента"],
+  "tzDraft": "черновик технического задания на основе разговора"
+}`;
+
+function AnalysisPanel({ rec, onRefresh }) {
+  const [open, setOpen] = useState(!!rec.analysis);
+  const [pasteText, setPasteText] = useState('');
+  const [result, setResult] = useState(rec.analysis ? (() => { try { return JSON.parse(rec.analysis); } catch { return null; } })() : null);
   const [creatingLead, setCreatingLead] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [parsing, setParsing] = useState(false);
   const navigate = useNavigate();
 
-  const analyze = async () => {
-    if (!transcript.trim()) return;
-    setLoading(true);
+  const copyPrompt = async () => {
+    await navigator.clipboard.writeText(AI_STUDIO_PROMPT);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const openAiStudio = async () => {
+    await copyPrompt();
+    window.open('https://aistudio.google.com/prompts/new_chat', '_blank');
+  };
+
+  const parseAndSave = async () => {
+    const text = pasteText.trim();
+    if (!text) return;
+    setParsing(true);
     try {
-      const r = await recordingsApi.analyze(rec.id, transcript);
-      setResult(r.data.analysis);
+      let parsed;
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) {
+        parsed = JSON.parse(match[0]);
+      } else {
+        alert('Не удалось найти JSON в ответе. Убедись что скопировал полный ответ от ИИ.');
+        setParsing(false);
+        return;
+      }
+      await recordingsApi.patch(rec.id, { analysis: JSON.stringify(parsed) });
+      setResult(parsed);
+      setPasteText('');
       onRefresh();
-    } catch (e) {
-      alert(e.response?.data?.error || 'Ошибка анализа');
+    } catch {
+      alert('Ошибка парсинга JSON. Попробуй скопировать ответ ещё раз.');
     } finally {
-      setLoading(false);
+      setParsing(false);
     }
   };
 
@@ -70,8 +107,7 @@ function AnalysisPanel({ rec, clients, leads, onRefresh }) {
     if (!result) return;
     setCreatingLead(true);
     try {
-      const { leadsApi: la } = await import('../api/client');
-      await la.create({
+      await leadsApi.create({
         name: result.name || 'Без имени',
         phone: result.phone || '',
         notes: [
@@ -86,7 +122,7 @@ function AnalysisPanel({ rec, clients, leads, onRefresh }) {
         status: 'needs_tz',
       });
       navigate('/leads');
-    } catch (e) {
+    } catch {
       alert('Ошибка создания лида');
       setCreatingLead(false);
     }
@@ -97,27 +133,71 @@ function AnalysisPanel({ rec, clients, leads, onRefresh }) {
       <button onClick={() => setOpen(o => !o)}
         className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-400 font-medium">
         <Sparkles size={12} />
-        {result ? 'ТЗ сгенерировано — посмотреть' : 'Анализ через ИИ / Сгенерировать ТЗ'}
+        {result ? 'ТЗ готово — посмотреть' : 'Получить транскрипцию и ТЗ через AI Studio'}
         {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
       </button>
 
       {open && (
         <div className="mt-3 space-y-3">
-          <div>
-            <label className="label">Транскрипция разговора</label>
-            <textarea
-              className="input resize-none text-sm"
-              rows={5}
-              placeholder="Вставьте текст разговора или опишите что обсуждали...&#10;&#10;Например: Клиент Артём из Алматы, нужен интернет-магазин с каталогом, корзиной и оплатой. Бюджет 500 тысяч. Срок месяц."
-              value={transcript}
-              onChange={e => setTranscript(e.target.value)}
-            />
-          </div>
-          <button onClick={analyze} disabled={loading || !transcript.trim()}
-            className="btn-primary text-sm flex items-center gap-2">
-            <Sparkles size={14} />
-            {loading ? 'Анализирую...' : 'Проанализировать и составить ТЗ'}
-          </button>
+          {!result && (
+            <div className="rounded-xl p-3 space-y-3" style={{ background: '#0A0A0A', border: '1px solid #1E1E1E' }}>
+              <p className="text-xs text-gray-500 font-medium">Инструкция — 3 шага:</p>
+              <div className="space-y-2">
+                <div className="flex gap-2.5 items-start">
+                  <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
+                    style={{ background: '#76B900', color: '#000' }}>1</span>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-300">Скачай аудио и открой AI Studio</p>
+                    <div className="flex gap-2 mt-1.5">
+                      <a href={recordingsApi.fileUrl(rec.filename)} download
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
+                        style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#aaa' }}>
+                        <Download size={12} /> Скачать аудио
+                      </a>
+                      <button onClick={openAiStudio}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
+                        style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#76B900' }}>
+                        <ExternalLink size={12} />
+                        Открыть AI Studio
+                        {copied && <span className="text-green-400 ml-1">· промпт скопирован!</span>}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2.5 items-start">
+                  <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
+                    style={{ background: '#76B900', color: '#000' }}>2</span>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-300">В AI Studio: загрузи аудио → вставь промпт (уже скопирован) → отправь</p>
+                    <button onClick={copyPrompt}
+                      className="mt-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
+                      style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: copied ? '#76B900' : '#666' }}>
+                      <Copy size={11} /> {copied ? 'Скопировано!' : 'Скопировать промпт'}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-2.5 items-start">
+                  <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5"
+                    style={{ background: '#76B900', color: '#000' }}>3</span>
+                  <div className="flex-1">
+                    <p className="text-xs text-gray-300 mb-1.5">Скопируй ответ от ИИ и вставь сюда</p>
+                    <textarea
+                      className="input resize-none text-xs font-mono"
+                      rows={4}
+                      placeholder={'{\n  "name": "Артём",\n  "phone": "+7 701...",\n  ...\n}'}
+                      value={pasteText}
+                      onChange={e => setPasteText(e.target.value)}
+                    />
+                    <button onClick={parseAndSave} disabled={parsing || !pasteText.trim()}
+                      className="btn-primary text-xs mt-2 flex items-center gap-2">
+                      <Sparkles size={12} />
+                      {parsing ? 'Обрабатываю...' : 'Применить и заполнить поля'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {result && (
             <div className="rounded-xl p-4 space-y-3" style={{ background: '#0F0F0F', border: '1px solid #212121' }}>
@@ -125,13 +205,17 @@ function AnalysisPanel({ rec, clients, leads, onRefresh }) {
                 <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                   <Sparkles size={14} className="text-primary-500" /> Результат анализа
                 </h3>
-                <button onClick={createLead} disabled={creatingLead}
-                  className="btn-primary text-xs py-1.5 flex items-center gap-1.5">
-                  <Plus size={12} /> {creatingLead ? 'Создаём...' : 'Создать лид'}
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={() => setResult(null)}
+                    className="text-xs text-gray-600 hover:text-gray-400">Переделать</button>
+                  <button onClick={createLead} disabled={creatingLead}
+                    className="btn-primary text-xs py-1.5 flex items-center gap-1.5">
+                    <Plus size={12} /> {creatingLead ? 'Создаём...' : 'Создать лид'}
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                 {[
                   ['Клиент', result.name],
                   ['Телефон', result.phone],
@@ -153,33 +237,26 @@ function AnalysisPanel({ rec, clients, leads, onRefresh }) {
                   <p className="text-sm text-gray-300">{result.projectEssence}</p>
                 </div>
               )}
-
               {result.requirements?.length > 0 && (
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Требования</p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {result.requirements.map((r, i) => (
-                      <li key={i} className="text-sm text-gray-300 flex gap-2">
-                        <span className="text-primary-600 mt-0.5">•</span> {r}
-                      </li>
+                      <li key={i} className="text-sm text-gray-300 flex gap-2"><span className="text-primary-600">•</span>{r}</li>
                     ))}
                   </ul>
                 </div>
               )}
-
               {result.openQuestions?.length > 0 && (
                 <div>
                   <p className="text-xs text-yellow-600 mb-1">Уточнить у клиента</p>
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {result.openQuestions.map((q, i) => (
-                      <li key={i} className="text-sm text-yellow-500/80 flex gap-2">
-                        <span className="mt-0.5">?</span> {q}
-                      </li>
+                      <li key={i} className="text-sm text-yellow-500/80 flex gap-2"><span>?</span>{q}</li>
                     ))}
                   </ul>
                 </div>
               )}
-
               {result.tzDraft && (
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Черновик ТЗ</p>
@@ -326,7 +403,7 @@ export default function RecordingsPage() {
               </button>
             </div>
             <AudioPlayer url={recordingsApi.fileUrl(rec.filename)} />
-            <AnalysisPanel rec={rec} clients={clients} leads={leads} onRefresh={load} />
+            <AnalysisPanel rec={rec} onRefresh={load} />
           </div>
         ))}
       </div>
