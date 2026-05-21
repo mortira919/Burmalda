@@ -21,6 +21,13 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 200 * 1024 * 1024 } });
 
+// Serve audio files without auth — filename is random timestamp, no sensitive data
+router.get('/file/:filename', (req, res) => {
+  const filepath = path.join(uploadDir, req.params.filename);
+  if (!fs.existsSync(filepath)) return res.status(404).json({ error: 'Not found' });
+  res.sendFile(filepath);
+});
+
 router.use(auth);
 
 router.get('/', async (req, res) => {
@@ -59,12 +66,6 @@ router.post('/upload', upload.single('audio'), async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-});
-
-router.get('/file/:filename', (req, res) => {
-  const filepath = path.join(uploadDir, req.params.filename);
-  if (!fs.existsSync(filepath)) return res.status(404).json({ error: 'Not found' });
-  res.sendFile(filepath);
 });
 
 router.patch('/:id', async (req, res) => {

@@ -43,6 +43,21 @@ function AudioPlayer({ url }) {
   );
 }
 
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+};
+
 const AI_STUDIO_PROMPT = `Ты — ассистент менеджера IT-студии. Прослушай аудиозапись разговора с потенциальным клиентом и верни ТОЛЬКО валидный JSON без markdown, без пояснений:
 
 {
@@ -68,7 +83,7 @@ function AnalysisPanel({ rec, onRefresh }) {
   const navigate = useNavigate();
 
   const copyPrompt = async () => {
-    await navigator.clipboard.writeText(AI_STUDIO_PROMPT);
+    await copyToClipboard(AI_STUDIO_PROMPT);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
