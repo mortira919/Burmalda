@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Loader2 } from 'lucide-react';
+import { Mic, Square, Loader2, MicOff } from 'lucide-react';
+
+const secure = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost';
 
 export default function VoiceRecorder({ onSave, disabled }) {
   const [state, setState] = useState('idle'); // idle | recording | uploading
@@ -39,7 +41,7 @@ export default function VoiceRecorder({ onSave, disabled }) {
       setSeconds(0);
       timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
     } catch {
-      alert('Нет доступа к микрофону');
+      setState('idle');
     }
   };
 
@@ -62,6 +64,15 @@ export default function VoiceRecorder({ onSave, disabled }) {
       style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
       <Loader2 size={14} className="animate-spin" /> Сохранение...
     </button>
+  );
+
+  if (!secure) return (
+    <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600"
+      style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
+      title="Микрофон требует HTTPS. Используй «Загрузить файл»">
+      <MicOff size={14} />
+      Запись недоступна (HTTP)
+    </div>
   );
 
   return (
