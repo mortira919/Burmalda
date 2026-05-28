@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { projectsApi, clientsApi, employeesApi } from '../api/client';
 import { formatDate, formatDateShort, formatMoney, daysUntil, PROJECT_STATUS, PROJECT_PRIORITY, PROJECT_STAGE } from '../utils/helpers';
 import Modal from '../components/Modal';
-import { Plus, Pencil, Trash2, FolderKanban, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, FolderKanban, Search, Wallet, X } from 'lucide-react';
 import { useSync } from '../hooks/useSync';
 import { MoneyInput } from '../components/FormInputs';
 
@@ -237,6 +237,63 @@ function ProjectForm({ initial, clients, employees, onSave, onCancel }) {
   );
 }
 
+function QuickPaymentForm({ projectId, projectName, onSave, onCancel }) {
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!parseFloat(amount)) return;
+    setSaving(true);
+    try {
+      await projectsApi.addPayment(projectId, {
+        amount,
+        description: description || `Платёж ${new Date(date).toLocaleDateString('ru')}`,
+        status: 'paid',
+        paidAt: new Date(date).toISOString(),
+      });
+      onSave();
+    } catch {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} onClick={e => e.stopPropagation()}
+      className="mt-3 p-3 rounded-xl space-y-2.5"
+      style={{ background: '#0F0F0F', border: '1px solid #2A2A2A' }}>
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-gray-300 flex items-center gap-1.5">
+          <Wallet size={12} className="text-primary-500" /> Платёж в проект «{projectName}»
+        </p>
+        <button type="button" onClick={onCancel} className="text-gray-600 hover:text-white"><X size={13} /></button>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <label className="text-xs text-gray-600 mb-1 block">Сумма</label>
+          <MoneyInput value={amount} onChange={setAmount} placeholder="500 000" required />
+        </div>
+        <div>
+          <label className="text-xs text-gray-600 mb-1 block">Дата</label>
+          <input type="date" className="input text-sm py-1.5" value={date} onChange={e => setDate(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs text-gray-600 mb-1 block">Описание</label>
+          <input className="input text-sm py-1.5" placeholder="(необязательно)" value={description} onChange={e => setDescription(e.target.value)} />
+        </div>
+      </div>
+      <div className="flex justify-end gap-2">
+        <button type="button" onClick={onCancel} className="btn-secondary py-1 px-3 text-xs">Отмена</button>
+        <button type="submit" disabled={saving || !parseFloat(amount)} className="btn-primary py-1 px-3 text-xs">
+          {saving ? 'Сохранение...' : 'Зафиксировать'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
@@ -246,6 +303,7 @@ export default function ProjectsPage() {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [tick, setTick] = useState(0);
+  const [quickPayId, setQuickPayId] = useState(null);
 
   const load = () => {
     Promise.all([projectsApi.getAll(), clientsApi.getAll(), employeesApi.getAll()])
@@ -365,6 +423,17 @@ export default function ProjectsPage() {
                     </div>
 
                     <div className="flex gap-1.5 shrink-0">
+                      {p.status !== 'completed' && (
+                        <button
+                          onClick={() => setQuickPayId(quickPayId === p.id ? null : p.id)}
+                          title="Зафиксировать поступление"
+                          className="py-1 px-2.5 rounded-xl text-sm flex items-center gap-1 transition-all"
+                          style={quickPayId === p.id
+                            ? { background: '#76B900', color: '#000' }
+                            : { background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#76B900' }}>
+                          <Wallet size={13} />
+                        </button>
+                      )}
                       <button
                         onClick={() => setModal({ type: 'edit', project: p, form: { ...p, clientId: p.clientId || '',
                           startDate: p.startDate ? p.startDate.split('T')[0] : '',
@@ -381,6 +450,14 @@ export default function ProjectsPage() {
                       <button onClick={() => handleDelete(p.id)} className="btn-danger py-1 px-2.5"><Trash2 size={13} /></button>
                     </div>
                   </div>
+                  {quickPayId === p.id && (
+                    <QuickPaymentForm
+                      projectId={p.id}
+                      projectName={p.name}
+                      onSave={() => { setQuickPayId(null); load(); }}
+                      onCancel={() => setQuickPayId(null)}
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -178,16 +178,37 @@ router.delete('/:id', async (req, res) => {
 // Add payment milestone
 router.post('/:id/payments', async (req, res) => {
   try {
-    const { amount, description } = req.body;
+    const { amount, description, status, paidAt } = req.body;
+    const projectId = Number(req.params.id);
+    const amt = parseFloat(amount) || 0;
+    const isPaid = status === 'paid';
+    const paidDate = paidAt ? new Date(paidAt) : (isPaid ? new Date() : null);
+
     const payment = await prisma.projectPayment.create({
       data: {
-        projectId: Number(req.params.id),
-        amount: parseFloat(amount) || 0,
+        projectId,
+        amount: amt,
         description,
-        status: 'pending',
+        status: isPaid ? 'paid' : 'pending',
+        paidAt: paidDate,
       },
     });
+
+    if (isPaid && amt > 0) {
+      const project = await prisma.project.findUnique({ where: { id: projectId }, select: { name: true, prepayment: true } });
+      await autoDistribute(projectId, project.name, amt, payment.id);
+      const paidTotal = await prisma.projectPayment.aggregate({
+        where: { projectId, status: 'paid' },
+        _sum: { amount: true },
+      });
+      await prisma.project.update({
+        where: { id: projectId },
+        data: { prepayment: paidTotal._sum.amount || 0 },
+      });
+    }
+
     socket.emit('data:changed', { type: 'project' });
+    socket.emit('data:changed', { type: 'employee' });
     res.status(201).json(payment);
   } catch (e) {
     res.status(500).json({ error: e.message });
